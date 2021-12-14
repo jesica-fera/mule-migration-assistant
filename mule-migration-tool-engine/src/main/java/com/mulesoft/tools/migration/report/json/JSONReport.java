@@ -15,6 +15,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -92,18 +93,28 @@ public class JSONReport {
     }
 
     private static String relativizePath(String filePath, Path basePath) {
+      String result = filePath;
       if (filePath == null) {
         return "";
       }
       Path path = new File(filePath).toPath();
       if (path.startsWith(basePath)) {
-        return basePath.relativize(path).toString();
+        result = basePath.relativize(path).toString();
       }
       String parentDomainBasePath = System.getProperty("parentDomainBasePath");
       if (parentDomainBasePath != null && path.startsWith(parentDomainBasePath)) {
-        return "{parentDomainBasePath}:/" + Paths.get(parentDomainBasePath).relativize(path);
+        result = "{parentDomainBasePath}:/" + Paths.get(parentDomainBasePath).relativize(path);
       }
-      return filePath;
+      return normalizePath(result);
+    }
+
+    private static String normalizePath(String path) {
+      String separator = FileSystems.getDefault().getSeparator();
+      String result = path;
+      if ("\\".equals(separator)) {
+        result = path.replaceAll("\\\\", "/");
+      }
+      return result;
     }
 
     public MigrationReport.Level getLevel() {
