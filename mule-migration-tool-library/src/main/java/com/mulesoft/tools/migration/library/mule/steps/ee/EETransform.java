@@ -54,7 +54,7 @@ public class EETransform extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Namespace eeNamespace = CORE_EE_NAMESPACE;
 
     getApplicationModel().addNameSpace(eeNamespace, EE_NAMESPACE_SCHEMA, element.getDocument());
@@ -166,8 +166,10 @@ public class EETransform extends AbstractApplicationModelMigrationStep {
         String migratedScript = migrateDWToV2(element.getText());
         element.removeContent();
         setText(element, migratedScript);
+        report.incrementDwTransformsSuccess();
       } catch (Exception ex) {
         report.report("dataWeave.migrationErrorScript", element, element, element.getText(), ex.getMessage());
+        report.incrementDwTransformsFailure();
       }
     } else if (element.getAttribute("resource") != null) {
       Attribute resourceAttr = element.getAttribute("resource");

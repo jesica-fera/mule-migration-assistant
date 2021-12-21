@@ -33,7 +33,7 @@ public class HttpConnectorListenerConfig extends AbstractHttpConnectorMigrationS
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(HTTP_NAMESPACE);
 
     if ("listener-config".equals(object.getName()) && object.getChild("listener-connection", HTTP_NAMESPACE) == null) {

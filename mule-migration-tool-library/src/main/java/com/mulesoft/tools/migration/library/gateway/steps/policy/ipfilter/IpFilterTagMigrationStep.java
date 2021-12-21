@@ -60,7 +60,7 @@ public class IpFilterTagMigrationStep extends FilterTagMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     migrateRootElement(element, IP_FILTER_GW_NAMESPACE, IP_FILTER_NAMESPACE, IP_FILTER_XSI_SCHEMA_LOCATION_URI_MULE3_XSD,
                        IP_FILTER_XSI_SCHEMA_LOCATION_URI_MULE4_XSD, IP_FILTER_XSI_SCHEMA_LOCATION_URI_MULE3,
                        IP_FILTER_XSI_SCHEMA_LOCATION_URI_MULE4);

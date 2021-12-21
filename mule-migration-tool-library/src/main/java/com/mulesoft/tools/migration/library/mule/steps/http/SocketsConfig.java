@@ -42,7 +42,7 @@ public class SocketsConfig extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(SOCKETS_NAMESPACE);
 
     if ("client-socket-properties".equals(object.getName())) {

@@ -32,7 +32,7 @@ public class ExpressionFilter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     addValidationsModule(element.getDocument());
 
     element.setName("is-true");

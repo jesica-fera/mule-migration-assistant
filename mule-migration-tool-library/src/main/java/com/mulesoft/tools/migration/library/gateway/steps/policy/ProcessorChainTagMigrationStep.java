@@ -35,7 +35,7 @@ public abstract class ProcessorChainTagMigrationStep extends PolicyMigrationStep
 
   protected abstract void migrateContent(Element element, final List<Content> cloneContentList);
 
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     final List<Content> cloneContentList = detachContent(element.getContent());
     Element source = setUpHttpPolicy(element, true, migrationReport);
     Element tryElement = source.getChild(TRY_TAG_NAME, MULE_4_CORE_NAMESPACE_NO_PREFIX);

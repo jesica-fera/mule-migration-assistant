@@ -48,7 +48,7 @@ public class Crc32Calculate extends AbstractApplicationModelMigrationStep implem
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     addCryptoNamespace(element.getDocument());
 
     element.setName("calculateChecksum");

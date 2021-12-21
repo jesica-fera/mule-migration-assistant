@@ -48,7 +48,7 @@ public class ScriptingModuleMigration extends AbstractApplicationModelMigrationS
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     changeNodeName("scripting", "execute").apply(element);
 
     Element scriptNode = element.getChildren("script", element.getNamespace()).size() > 0

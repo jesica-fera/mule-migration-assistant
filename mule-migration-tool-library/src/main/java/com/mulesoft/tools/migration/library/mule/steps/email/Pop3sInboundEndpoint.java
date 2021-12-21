@@ -36,7 +36,7 @@ public class Pop3sInboundEndpoint extends Pop3InboundEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Optional<Element> pop3sConnector;
     if (object.getAttribute("connector-ref") != null) {
       pop3sConnector = Optional.of(getConnector(object.getAttributeValue("connector-ref")));
@@ -44,7 +44,7 @@ public class Pop3sInboundEndpoint extends Pop3InboundEndpoint {
       pop3sConnector = getDefaultConnector();
     }
 
-    super.execute(object, report);
+    super.executeMigration(object, report);
 
     Element pop3sConnection = getApplicationModel()
         .getNode("/*/*[namespace-uri() = '" + EMAIL_NAMESPACE.getURI() + "' and local-name() = 'pop3-config' and @name = '"

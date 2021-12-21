@@ -45,7 +45,7 @@ public class SimpleExpressionTransformer extends AbstractApplicationModelMigrati
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("set-payload");
     String migratedExpression;
 

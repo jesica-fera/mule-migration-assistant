@@ -37,7 +37,7 @@ public class Logger extends AbstractApplicationModelMigrationStep implements Exp
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     migrateExpression(element.getAttribute("message"), expressionMigrator);
   }
 

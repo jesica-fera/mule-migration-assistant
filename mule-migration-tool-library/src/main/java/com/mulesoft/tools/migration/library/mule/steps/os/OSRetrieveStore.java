@@ -30,7 +30,7 @@ public class OSRetrieveStore extends AbstractOSMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Integer position = element.getParentElement().indexOf(element);
 
     addNewRetrieveOperation(element, position);

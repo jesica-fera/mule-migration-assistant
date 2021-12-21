@@ -41,7 +41,7 @@ public class CacheObjectStoreCachingStrategy extends AbstractApplicationModelMig
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     migrateExpression(element.getAttribute("keyGenerationExpression"), expressionMigrator);
 
     if (element.getAttribute("consumableFilter-ref") != null) {

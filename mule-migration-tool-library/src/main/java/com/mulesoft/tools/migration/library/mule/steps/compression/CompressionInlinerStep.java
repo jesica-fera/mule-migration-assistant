@@ -29,7 +29,7 @@ public class CompressionInlinerStep extends AbstractApplicationModelMigrationSte
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     String refName = element.getAttribute("name").getValue();
     List<Element> refs = getApplicationModel().getNodes(String.format("//mule:transformer[@ref = '%s']", refName));
 

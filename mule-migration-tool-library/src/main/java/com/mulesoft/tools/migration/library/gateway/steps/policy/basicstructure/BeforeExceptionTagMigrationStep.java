@@ -25,7 +25,7 @@ public class BeforeExceptionTagMigrationStep extends AbstractBasicStructureMigra
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     migrationReport.report("basicStructure.beforeExceptionMigrationStep", element, element);
     detachContent(element.getContent());
     setUpHttpPolicy(element, true, migrationReport);

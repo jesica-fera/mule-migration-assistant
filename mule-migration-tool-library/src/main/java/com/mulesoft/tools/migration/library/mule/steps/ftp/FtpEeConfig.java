@@ -39,8 +39,8 @@ public class FtpEeConfig extends FtpConfig {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
-    super.execute(object, report);
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
+    super.executeMigration(object, report);
 
     String fileAge = null;
     if (object.getAttribute("fileAge") != null) {

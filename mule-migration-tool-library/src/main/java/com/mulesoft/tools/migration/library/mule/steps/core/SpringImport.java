@@ -36,7 +36,7 @@ public class SpringImport extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Attribute resource = element.getAttribute("resource");
     Element parent = element.getParentElement();
     if (resource != null && isMuleConfigFile(resource.getValue(), getApplicationModel().getProjectBasePath())) {

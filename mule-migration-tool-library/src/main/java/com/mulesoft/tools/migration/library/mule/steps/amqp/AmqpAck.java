@@ -41,7 +41,7 @@ public class AmqpAck extends AbstractApplicationModelMigrationStep implements Ex
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(AMQP_NAMESPACE);
     object.setName("ack");
     object.setAttribute("ackId", "#[attributes.ackId]");

@@ -37,7 +37,7 @@ public class RemoveAttachment extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       changeNodeName("", "remove-variable")
           .andThen(changeAttribute("attachmentName", of("variableName"),

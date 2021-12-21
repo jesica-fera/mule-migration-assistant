@@ -32,7 +32,7 @@ public class IdempotentSecureHashMessageFilter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     String messageDigestAlgorithm = element.getAttributeValue("messageDigestAlgorithm");
     messageDigestAlgorithm = messageDigestAlgorithm == null ? "SHA-256" : messageDigestAlgorithm;
     element.removeAttribute("messageDigestAlgorithm");

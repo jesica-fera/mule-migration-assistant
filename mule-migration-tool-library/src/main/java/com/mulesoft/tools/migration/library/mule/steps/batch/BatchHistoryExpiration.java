@@ -33,7 +33,7 @@ public class BatchHistoryExpiration extends AbstractApplicationModelMigrationSte
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Attribute maxAge = object.getAttribute("max-age");
     if (maxAge != null) {
       maxAge.setName("maxAge");

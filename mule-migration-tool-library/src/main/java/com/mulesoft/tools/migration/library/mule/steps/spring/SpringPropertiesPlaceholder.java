@@ -34,7 +34,7 @@ public class SpringPropertiesPlaceholder extends AbstractSpringMigratorStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     int idx = 1;
     Element elementToComment = null;
     for (String location : object.getAttributeValue("location").split("\\,")) {

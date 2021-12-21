@@ -33,7 +33,7 @@ public class ConsoleTagMigrationStep extends RamlMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     String configRef = element.getAttributeValue(CONFIG_REF_ATTR_NAME);
     if (hasMatchingRamlProxyConfig(getRootElement(element), configRef)) {
       element.setNamespace(REST_VALIDATOR_NAMESPACE);

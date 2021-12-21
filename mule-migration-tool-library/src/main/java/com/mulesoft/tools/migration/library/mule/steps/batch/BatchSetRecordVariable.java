@@ -39,7 +39,7 @@ public class BatchSetRecordVariable extends AbstractApplicationModelMigrationSte
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(CORE_NAMESPACE);
     object.setName("set-variable");
 

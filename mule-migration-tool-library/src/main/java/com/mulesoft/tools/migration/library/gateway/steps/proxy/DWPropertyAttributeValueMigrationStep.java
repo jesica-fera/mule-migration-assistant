@@ -33,7 +33,7 @@ public class DWPropertyAttributeValueMigrationStep extends GatewayMigrationStep 
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.getAttributes().stream().filter(attr -> attr.getValue().startsWith(PROPERTY_ATTRIBUTE_VALUE_START))
         .forEach(attribute -> replaceValue(attribute));
   }

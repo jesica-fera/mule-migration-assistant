@@ -20,6 +20,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -34,28 +35,23 @@ public class JSONReport {
 
 
   private final File reportDirectory;
-  private List<ReportEntryModel> reportEntries;
-  private Path outputProject;
+  private final MigrationReport<ReportEntryModel> report;
+  private final Path outputProject;
 
 
-  public JSONReport(List<ReportEntryModel> reportEntries, File reportDirectory, Path outputProject) {
-    this.reportEntries = reportEntries;
+  public JSONReport(MigrationReport<ReportEntryModel> report, File reportDirectory, Path outputProject) {
+    this.report = report;
     this.outputProject = outputProject;
-    checkNotNull(reportEntries, "Report Entries cannot be null");
+    checkNotNull(report.getReportEntries(), "Report Entries cannot be null");
     checkNotNull(reportDirectory, "Report directory cannot be null");
     this.reportDirectory = reportDirectory;
   }
 
   public void printReport() {
     Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    List<JSONReportModel> jsonReportModelList =
-        reportEntries.stream()
-            .map((re) -> JSONReportModel.fromReportModel(re, outputProject))
-            .sorted(Comparator.comparing(JSONReportModel::getMessage))
-            .sorted(Comparator.comparing(JSONReportModel::getColumnNumber))
-            .sorted(Comparator.comparing(JSONReportModel::getLineNumber))
-            .collect(Collectors.toList());
-    String json = gson.toJson(jsonReportModelList);
+
+    JSONReportModel jsonReportModel = new JSONReportModel(report, outputProject);
+    String json = gson.toJson(jsonReportModel);
     File file = new File(reportDirectory, "report.json");
     try (OutputStreamWriter fileWriter = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
       fileWriter.append(json);
@@ -69,16 +65,95 @@ public class JSONReport {
    */
   static class JSONReportModel {
 
-    private final MigrationReport.Level level;
+    private final String projectType;
+    private final String projectName;
+    private final List<String> connectorsUsed;
+    private final Integer numberOfMuleComponents;
+    private final Integer numberOfMuleComponentsMigrated;
+    private final Map<String, int[]> componentDetails;
+    private final Integer numberOfMELExpLines;
+    private final Integer numberOfMELExpLinesMigrated;
+    private final Integer numberOfDWTransformations;
+    private final Integer numberOfDWTransformationsMigrated;
+    private final List<JSONReportEntryModel> detailedMessages;
 
+    public JSONReportModel(MigrationReport<ReportEntryModel> report, Path outputProject) {
+      projectType = report.getProjectType();
+      projectName = report.getProjectName();
+      connectorsUsed = report.getConnectorNames();
+      numberOfMuleComponentsMigrated = report.getComponentSuccessCount();
+      numberOfMuleComponents = report.getComponentFailureCount() + numberOfMuleComponentsMigrated;
+      componentDetails = report.getComponents();
+      numberOfMELExpLinesMigrated = report.getMelExpressionsSuccessLineCount();
+      numberOfMELExpLines = report.getMelExpressionsFailureLineCount() + numberOfMELExpLinesMigrated;
+      numberOfDWTransformationsMigrated = report.getDwTransformsSuccessCount();
+      numberOfDWTransformations = report.getDwTransformsFailureCount() + numberOfDWTransformationsMigrated;
+      detailedMessages = report.getReportEntries().stream()
+          .map((re) -> JSONReportEntryModel.fromReportModel(re, outputProject))
+          .sorted(Comparator.comparing(JSONReportEntryModel::getMessage))
+          .sorted(Comparator.comparing(JSONReportEntryModel::getColumnNumber))
+          .sorted(Comparator.comparing(JSONReportEntryModel::getLineNumber))
+          .collect(Collectors.toList());
+    }
+
+    public String getProjectType() {
+      return projectType;
+    }
+
+    public String getProjectName() {
+      return projectName;
+    }
+
+    public List<String> getConnectorsUsed() {
+      return connectorsUsed;
+    }
+
+    public Integer getNumberOfMuleComponents() {
+      return numberOfMuleComponents;
+    }
+
+    public Integer getNumberOfMuleComponentsMigrated() {
+      return numberOfMuleComponentsMigrated;
+    }
+
+    public Map<String, int[]> getComponentDetails() {
+      return componentDetails;
+    }
+
+    public Integer getNumberOfMELExpLines() {
+      return numberOfMELExpLines;
+    }
+
+    public Integer getNumberOfMELExpLinesMigrated() {
+      return numberOfMELExpLinesMigrated;
+    }
+
+    public Integer getNumberOfDWTransformations() {
+      return numberOfDWTransformations;
+    }
+
+    public Integer getNumberOfDWTransformationsMigrated() {
+      return numberOfDWTransformationsMigrated;
+    }
+
+    public List<JSONReportEntryModel> getDetailedMessages() {
+      return detailedMessages;
+    }
+  }
+
+  static class JSONReportEntryModel {
+
+    private final MigrationReport.Level level;
+    private final String key;
     private final Integer lineNumber;
     private final Integer columnNumber;
     private final String message;
     private final String filePath;
     private final List<String> documentationLinks = new ArrayList<>();
 
-    public JSONReportModel(MigrationReport.Level level, Integer lineNumber, Integer columnNumber, String message,
-                           String filePath) {
+    public JSONReportEntryModel(String key, MigrationReport.Level level, Integer lineNumber, Integer columnNumber, String message,
+                                String filePath) {
+      this.key = key;
       this.level = level;
       this.lineNumber = lineNumber;
       this.columnNumber = columnNumber;
@@ -86,9 +161,10 @@ public class JSONReport {
       this.filePath = filePath;
     }
 
-    public static JSONReportModel fromReportModel(ReportEntryModel rem, Path outputFolder) {
+    public static JSONReportEntryModel fromReportModel(ReportEntryModel rem, Path outputFolder) {
       String filePath = relativizePath(rem.getFilePath(), outputFolder);
-      return new JSONReportModel(rem.getLevel(), rem.getLineNumber(), rem.getColumnNumber(), rem.getMessage(), filePath);
+      return new JSONReportEntryModel(rem.getKey(), rem.getLevel(), rem.getLineNumber(), rem.getColumnNumber(), rem.getMessage(),
+                                      filePath);
     }
 
     private static String relativizePath(String filePath, Path basePath) {
@@ -104,6 +180,10 @@ public class JSONReport {
         return "{parentDomainBasePath}:/" + Paths.get(parentDomainBasePath).relativize(path);
       }
       return filePath;
+    }
+
+    public String getKey() {
+      return key;
     }
 
     public MigrationReport.Level getLevel() {

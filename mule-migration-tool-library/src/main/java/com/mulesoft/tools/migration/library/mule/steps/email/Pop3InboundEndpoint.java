@@ -47,7 +47,7 @@ public class Pop3InboundEndpoint extends AbstractEmailSourceMigrator implements 
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("listener-pop3");
     object.setNamespace(EMAIL_NAMESPACE);
 

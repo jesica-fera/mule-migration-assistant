@@ -66,7 +66,7 @@ public class SpringContributions extends AbstractSpringMigratorStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Document muleDocument = object.getDocument();
     Document springDocument = resolveSpringDocument(muleDocument);
 

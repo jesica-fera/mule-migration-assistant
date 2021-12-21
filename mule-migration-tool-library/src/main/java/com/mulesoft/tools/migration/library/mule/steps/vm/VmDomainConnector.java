@@ -22,7 +22,7 @@ import org.jdom2.Namespace;
 public class VmDomainConnector extends VmConnector {
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     final Namespace vmConnectorNamespace = getNamespace("vm", "http://www.mulesoft.org/schema/mule/vm");
     getApplicationModel().addNameSpace(vmConnectorNamespace, "http://www.mulesoft.org/schema/mule/vm/current/mule-vm.xsd",
                                        object.getDocument());

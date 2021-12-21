@@ -35,7 +35,7 @@ public class JsonToXmlTransformer extends AbstractApplicationModelMigrationStep 
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     getApplicationModel().addNameSpace(CORE_EE_NAMESPACE, EE_NAMESPACE_SCHEMA, element.getDocument());
     element.setName("transform");
     element.setNamespace(CORE_EE_NAMESPACE);

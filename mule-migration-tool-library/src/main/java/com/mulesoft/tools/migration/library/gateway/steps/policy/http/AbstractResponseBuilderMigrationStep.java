@@ -59,7 +59,7 @@ public abstract class AbstractResponseBuilderMigrationStep extends PolicyMigrati
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.setName(SET_RESPONSE_TAG_NAME);
     element.setNamespace(HTTP_TRANSFORM_NAMESPACE);
     addNamespaceDeclaration(getRootElement(element), HTTP_TRANSFORM_NAMESPACE, HTTP_TRANSFORM_XSI_SCHEMA_LOCATION_URI);

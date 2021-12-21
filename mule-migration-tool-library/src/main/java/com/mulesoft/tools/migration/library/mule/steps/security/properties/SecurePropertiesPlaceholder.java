@@ -44,7 +44,7 @@ public class SecurePropertiesPlaceholder extends AbstractApplicationModelMigrati
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     getApplicationModel().addNameSpace(SECURE_NAMESPACE, SECURE_SCHEMA, object.getDocument());
     int idx = object.getParent().indexOf(object);
     int j = 1;

@@ -61,7 +61,7 @@ public class PolicyTagMigrationStep extends AbstractBasicStructureMigrationStep 
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.setName(PolicyMigrationStep.MULE_4_TAG_NAME);
     element.setNamespace(MULE_4_CORE_NAMESPACE_NO_PREFIX);
     element.addNamespaceDeclaration(MULE_4_POLICY_NAMESPACE);

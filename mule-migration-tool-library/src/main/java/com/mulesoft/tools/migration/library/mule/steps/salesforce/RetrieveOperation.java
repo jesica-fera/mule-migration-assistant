@@ -35,8 +35,8 @@ public class RetrieveOperation extends AbstractSalesforceOperationMigrationStep 
   }
 
   @Override
-  public void execute(Element mule3Operation, MigrationReport report) throws RuntimeException {
-    super.execute(mule3Operation, report);
+  public void executeMigration(Element mule3Operation, MigrationReport report) throws RuntimeException {
+    super.executeMigration(mule3Operation, report);
     SalesforceUtils.resolveTypeAttribute(mule3Operation, mule4Operation);
     setIdsAndFieldsElement(mule3Operation, mule4Operation);
 

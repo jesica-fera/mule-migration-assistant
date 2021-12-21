@@ -35,7 +35,7 @@ public class Configuration extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     if (element.getAttribute("defaultProcessingStrategy") != null) {
       element.removeAttribute("defaultProcessingStrategy");
       report.report("configuration.processingStrategy", element, element);

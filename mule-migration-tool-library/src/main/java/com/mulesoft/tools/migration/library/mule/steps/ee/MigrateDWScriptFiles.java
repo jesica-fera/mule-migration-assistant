@@ -37,8 +37,10 @@ public class MigrateDWScriptFiles implements ProjectStructureContribution {
     dwFiles.forEach(f -> {
       try {
         migrateFile(f);
+        report.incrementDwTransformsSuccess();
       } catch (Exception ex) {
         report.report("dataWeave.migrationErrorFile", null, null, f.getPath(), ex.getMessage());
+        report.incrementDwTransformsFailure();
       }
     });
   }

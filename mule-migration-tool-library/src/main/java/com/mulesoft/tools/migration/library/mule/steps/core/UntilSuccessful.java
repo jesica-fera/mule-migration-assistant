@@ -54,7 +54,7 @@ public class UntilSuccessful extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     List<Element> childs = new ArrayList<>(element.getChildren());
     childs.forEach(c -> {
       if (c.getName().equals("processor-chain")) {

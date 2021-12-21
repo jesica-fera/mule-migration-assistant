@@ -37,7 +37,7 @@ public class AmqpReject extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(AMQP_NAMESPACE);
     object.setName("reject");
     object.setAttribute("ackId", "#[attributes.ackId]");

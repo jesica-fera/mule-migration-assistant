@@ -30,7 +30,7 @@ public class SubFlow extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.setAttribute("name", element.getAttributeValue("name")
         .replaceAll("\\/", "\\\\")
         .replaceAll("\\[|\\{", "(")

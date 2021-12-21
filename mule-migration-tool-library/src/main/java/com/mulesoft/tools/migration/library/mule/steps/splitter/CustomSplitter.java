@@ -28,7 +28,7 @@ public class CustomSplitter extends AbstractSplitter {
   }
 
   @Override
-  public void execute(Element splitter, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element splitter, MigrationReport report) throws RuntimeException {
     report.report("splitter.custom", splitter, splitter);
     getMatchingAggregatorElement(splitter).ifPresent(
                                                      a -> {

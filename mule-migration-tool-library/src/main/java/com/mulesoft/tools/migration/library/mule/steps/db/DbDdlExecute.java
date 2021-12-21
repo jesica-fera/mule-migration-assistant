@@ -33,7 +33,7 @@ public class DbDdlExecute extends AbstractDbOperationMigrator {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     migrateSql(object);
     if (object.getAttribute("source") != null) {
       report.report("db.source", object, object);

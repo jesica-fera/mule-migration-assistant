@@ -51,7 +51,7 @@ public class SmtpOutboundEndpoint extends AbstractEmailMigrator
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     smtpTransportLib(getApplicationModel());
 
     object.setName("send");

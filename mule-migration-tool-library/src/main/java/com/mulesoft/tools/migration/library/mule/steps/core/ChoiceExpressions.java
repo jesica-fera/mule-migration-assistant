@@ -38,7 +38,7 @@ public class ChoiceExpressions extends AbstractApplicationModelMigrationStep imp
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     List<Element> whenNodes = element.getChildren(WHEN_NODE_NAME, element.getNamespace());
     whenNodes.forEach(this::migrateExpression);
   }

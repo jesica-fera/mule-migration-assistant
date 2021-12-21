@@ -33,7 +33,7 @@ public class AuthorizationFilter extends AbstractSpringMigratorStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(SPRING_NAMESPACE);
   }
 

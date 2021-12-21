@@ -54,7 +54,7 @@ public class DbConfig extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
 
     if ("template-query".equals(object.getName())) {
       List<Element> templateRefs = getApplicationModel().getNodes("//*[namespace-uri() = '" + DB_NAMESPACE_URI

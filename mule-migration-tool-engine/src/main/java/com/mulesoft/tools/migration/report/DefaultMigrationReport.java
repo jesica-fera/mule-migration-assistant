@@ -5,27 +5,34 @@
  */
 package com.mulesoft.tools.migration.report;
 
+import static com.mulesoft.tools.migration.step.category.MigrationReport.Level.ERROR;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.list;
+
 import com.mulesoft.tools.migration.exception.MigrationAbortException;
 import com.mulesoft.tools.migration.project.ProjectType;
 import com.mulesoft.tools.migration.report.html.model.ReportEntryModel;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
 import com.mulesoft.tools.migration.step.util.XmlDslUtils;
-import org.jdom2.Comment;
-import org.jdom2.Element;
-import org.jdom2.output.XMLOutputter;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.mulesoft.tools.migration.step.category.MigrationReport.Level.ERROR;
-import static java.util.Collections.emptyList;
-import static java.util.Collections.list;
+import org.jdom2.Comment;
+import org.jdom2.Element;
+import org.jdom2.output.XMLOutputter;
+import org.yaml.snakeyaml.Yaml;
 
 /**
  * Default implementation of a {@link MigrationReport}.
@@ -47,6 +54,17 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   private double successfulMigrationRatio;
   private double errorMigrationRatio;
   private int processedElements;
+
+  private final int SUCCESS_IDX = 0;
+  private final int FAILURE_IDX = 1;
+  private final Map<String, int[]> connectors = new LinkedHashMap<>();
+  private final Map<String, int[]> components = new LinkedHashMap<>();
+  private int dwTransformsSuccess;
+  private int dwTransformsFailure;
+  private int melLinesSuccess;
+  private int melLinesFailure;
+  private int melExpressionsSuccess;
+  private int melExpressionsFailure;
 
 
   public DefaultMigrationReport() {
@@ -94,20 +112,25 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     result.append(message.substring(currentIndex));
 
     final List<String> docLinks = entryData.get("docLinks") != null ? (List<String>) entryData.get("docLinks") : emptyList();
-    report(level, element, elementToComment, result.toString(), docLinks.toArray(new String[docLinks.size()]));
+    report(entryKey, level, element, elementToComment, result.toString(), docLinks.toArray(new String[docLinks.size()]));
   }
 
   @Override
   public void report(Level level, Element element, Element elementToComment, String message, String... documentationLinks) {
+    report(null, level, element, elementToComment, message, documentationLinks);
+  }
+
+  private void report(String entryKey, Level level, Element element, Element elementToComment, String message,
+                      String... documentationLinks) {
     int i = 0;
 
     ReportEntryModel reportEntry;
 
     if (elementToComment != null) {
       if (elementToComment.getDocument() != null || element.getDocument() == null) {
-        reportEntry = new ReportEntryModel(level, elementToComment, message, documentationLinks);
+        reportEntry = new ReportEntryModel(entryKey, level, elementToComment, message, documentationLinks);
       } else {
-        reportEntry = new ReportEntryModel(level, elementToComment, message, element.getDocument(), documentationLinks);
+        reportEntry = new ReportEntryModel(entryKey, level, elementToComment, message, element.getDocument(), documentationLinks);
       }
 
       if (reportEntries.add(reportEntry)) {
@@ -169,4 +192,113 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   public double getErrorMigrationRatio() {
     return errorMigrationRatio;
   }
+
+  @Override
+  public List<String> getConnectorNames() {
+    return new ArrayList<>(connectors.keySet());
+  }
+
+  @Override
+  public void addConnector(String name, boolean success) {
+    connectors.putIfAbsent(name, new int[] {0, 0});
+    connectors.get(name)[success ? SUCCESS_IDX : FAILURE_IDX] += 1;
+  }
+
+  @Override
+  public void addConnectorSuccess(String name) {
+    addConnector(name, true);
+  }
+
+  @Override
+  public void addConnectorFailure(String name) {
+    addConnector(name, false);
+  }
+
+  @Override
+  public Integer getComponentSuccessCount() {
+    return components.values().stream().map(v -> v[SUCCESS_IDX]).reduce(0, Integer::sum);
+  }
+
+  @Override
+  public Integer getComponentFailureCount() {
+    return components.values().stream().map(v -> v[FAILURE_IDX]).reduce(0, Integer::sum);
+  }
+
+  @Override
+  public int getComponentFailureCount(Element element) {
+    return components.getOrDefault(getComponentKey(element), new int[] {0, 0})[FAILURE_IDX];
+  }
+
+  @Override
+  public Map<String, int[]> getComponents() {
+    return components;
+  }
+
+  private String getComponentKey(Element element) {
+    return String.format("%s:%s", element.getNamespace().getPrefix(), element.getName());
+  }
+
+  @Override
+  public void addComponent(Element element, boolean success) {
+    String name = getComponentKey(element);
+    components.putIfAbsent(name, new int[] {0, 0});
+    components.get(name)[success ? SUCCESS_IDX : FAILURE_IDX] += 1;
+  }
+
+  @Override
+  public void addComponentSuccess(Element element) {
+    addComponent(element, true);
+  }
+
+  @Override
+  public void addComponentFailure(Element element) {
+    addComponent(element, false);
+  }
+
+  @Override
+  public Integer getDwTransformsSuccessCount() {
+    return dwTransformsSuccess;
+  }
+
+  @Override
+  public Integer getDwTransformsFailureCount() {
+    return dwTransformsFailure;
+  }
+
+  @Override
+  public void incrementDwTransformsSuccess() {
+    this.dwTransformsSuccess++;
+  }
+
+  @Override
+  public void incrementDwTransformsFailure() {
+    this.dwTransformsFailure++;
+  }
+
+  @Override
+  public Integer getMelExpressionsSuccessLineCount() {
+    return melLinesSuccess;
+  }
+
+  @Override
+  public Integer getMelExpressionsFailureLineCount() {
+    return melLinesFailure;
+  }
+
+  @Override
+  public void melExpressionSuccess(String melExpression) {
+    this.melExpressionsSuccess++;
+    this.melLinesSuccess += countLines(melExpression);
+  }
+
+  @Override
+  public void melExpressionFailure(String melExpression) {
+    this.melExpressionsFailure++;
+    this.melLinesFailure += countLines(melExpression);
+  }
+
+  private int countLines(String melExpression) {
+    return melExpression.split("\\r\\n|\\r|\\n").length;
+  }
+
 }

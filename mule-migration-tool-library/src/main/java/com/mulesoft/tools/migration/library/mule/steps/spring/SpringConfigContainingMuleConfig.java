@@ -35,7 +35,7 @@ public class SpringConfigContainingMuleConfig extends AbstractSpringMigratorStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Document muleDocuemnt = object.getDocument();
     Document springDocument = resolveSpringDocument(muleDocuemnt);
 

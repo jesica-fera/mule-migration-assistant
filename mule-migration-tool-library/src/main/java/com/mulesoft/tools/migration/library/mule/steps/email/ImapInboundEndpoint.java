@@ -47,7 +47,7 @@ public class ImapInboundEndpoint extends AbstractEmailSourceMigrator implements 
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("listener-imap");
     object.setNamespace(EMAIL_NAMESPACE);
 

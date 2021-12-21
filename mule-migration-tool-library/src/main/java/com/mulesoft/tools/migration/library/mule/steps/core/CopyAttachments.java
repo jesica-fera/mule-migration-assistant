@@ -33,7 +33,7 @@ public class CopyAttachments extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("message.inboundAttachments", element, element);
     element.setName("multipart-to-vars");
     element.setNamespace(COMPATIBILITY_NAMESPACE);

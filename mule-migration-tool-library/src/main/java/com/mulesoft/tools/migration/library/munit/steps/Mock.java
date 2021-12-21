@@ -47,7 +47,7 @@ public class Mock extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       changeNodeName(MUNIT_TOOLS_PREFIX, "mock-when")
           .andThen(changeAttribute("messageProcessor", of("processor"), empty()))

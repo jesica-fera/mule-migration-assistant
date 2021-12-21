@@ -38,8 +38,8 @@ public class ScriptingFilterMigration extends ScriptingModuleMigration {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
-    super.execute(element, report);
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
+    super.executeMigration(element, report);
     element.setAttribute("target", "filterAccepted");
     addElementAfter(new Element("is-true", VALIDATION_NAMESPACE).setAttribute("expression", "#[vars.filterAccepted]"), element);
     handleFilter(element);

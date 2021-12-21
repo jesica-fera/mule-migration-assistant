@@ -36,7 +36,7 @@ public class ApikitNamespace extends AbstractApikitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     final Document document = element.getDocument();
 
     if (!namespaceUpdated) {

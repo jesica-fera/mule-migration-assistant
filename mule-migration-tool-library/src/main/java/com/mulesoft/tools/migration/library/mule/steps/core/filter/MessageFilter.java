@@ -37,7 +37,7 @@ public class MessageFilter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     if (element.getParentElement().isRootElement()) {
       // Nothing to do, this will be removed
       return;

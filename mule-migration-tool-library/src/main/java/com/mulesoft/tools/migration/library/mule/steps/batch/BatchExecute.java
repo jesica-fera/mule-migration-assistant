@@ -38,7 +38,7 @@ public class BatchExecute extends AbstractApplicationModelMigrationStep implemen
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(CORE_NAMESPACE);
     object.setName("flow-ref");
 

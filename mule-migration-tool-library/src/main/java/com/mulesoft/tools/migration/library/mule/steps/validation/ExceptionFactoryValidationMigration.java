@@ -32,7 +32,7 @@ public class ExceptionFactoryValidationMigration extends AbstractApplicationMode
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("validation.exceptionFactory", element, element);
   }
 

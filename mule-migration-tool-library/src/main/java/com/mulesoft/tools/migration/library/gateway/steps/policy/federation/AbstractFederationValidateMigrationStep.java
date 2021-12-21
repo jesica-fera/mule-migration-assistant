@@ -137,7 +137,7 @@ public abstract class AbstractFederationValidateMigrationStep extends PolicyMigr
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.removeAttribute(THROW_ON_UNACCEPTED_ATTR_NAME);
     Element rootElement = getRootElement(element);
     addNamespaceDeclarations(rootElement);

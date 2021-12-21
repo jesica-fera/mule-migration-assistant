@@ -26,7 +26,7 @@ public class TagsTagMigrationStep extends GatewayMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     migrationReport.report("proxy.tagsTagMigrationStep", element, element);
     element.removeContent();
     element.detach();

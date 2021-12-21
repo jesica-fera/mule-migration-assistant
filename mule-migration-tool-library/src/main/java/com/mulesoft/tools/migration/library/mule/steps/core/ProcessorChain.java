@@ -35,7 +35,7 @@ public class ProcessorChain extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     String name = element.getAttributeValue("name");
     Element subFlow = new Element("sub-flow", CORE_NAMESPACE).setAttribute("name", name);
     subFlow.addContent(element.cloneContent());

@@ -46,7 +46,7 @@ public class MUnitTest extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       element.setAttribute("name", element.getAttributeValue("name")
           .replaceAll("/", "\\\\")

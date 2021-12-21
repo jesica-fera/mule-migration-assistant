@@ -30,7 +30,7 @@ public class AggregatorWithNoSplitter extends AbstractApplicationModelMigrationS
   }
 
   @Override
-  public void execute(Element aggregator, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element aggregator, MigrationReport report) throws RuntimeException {
     if (!isAggregatorProcessed(aggregator)) {
       report.report("aggregator.noSplitter", aggregator, aggregator);
     }

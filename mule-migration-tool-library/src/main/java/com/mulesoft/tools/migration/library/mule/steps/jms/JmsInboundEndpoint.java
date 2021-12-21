@@ -67,7 +67,7 @@ public class JmsInboundEndpoint extends AbstractJmsEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     jmsTransportLib(getApplicationModel());
 
     addMigrationAttributeToElement(object, new Attribute("isMessageSource", "true"));

@@ -33,7 +33,7 @@ public class ProxyResponseHeadersProcessorMigrationStep extends ProxyHeadersProc
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     new ProxyPomContributionMigrationStep(true).execute(getApplicationModel().getPomModel().get(), migrationReport);
     addConfigElement(element, migrationReport);
     element.setName(RESPONSE_HEADERS);

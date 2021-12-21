@@ -53,7 +53,7 @@ public class HttpPollingConnector extends AbstractApplicationModelMigrationStep 
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Namespace httpNamespace = Namespace.getNamespace("http", "http://www.mulesoft.org/schema/mule/http");
 
     handleServiceOverrides(object, report);

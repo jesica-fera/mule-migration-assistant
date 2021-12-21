@@ -36,8 +36,8 @@ public class HttpsPollingConnector extends HttpPollingConnector {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
-    super.execute(object, report);
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
+    super.executeMigration(object, report);
 
     Element httpsRequesterConnection = getApplicationModel()
         .getNode("/*/*[namespace-uri()='" + HTTP_NAMESPACE_URI + "' and local-name()='request-config' and @name = '"

@@ -52,7 +52,7 @@ public class RequestReply extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     final Element request = object.getChildren().get(0);
     final Element reply = object.getChildren().get(1);
 

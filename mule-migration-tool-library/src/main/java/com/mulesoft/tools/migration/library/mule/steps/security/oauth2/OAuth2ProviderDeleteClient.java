@@ -41,7 +41,7 @@ public class OAuth2ProviderDeleteClient extends AbstractApplicationModelMigratio
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     final Element cfg = getApplicationModel()
         .getNode("/*/*[namespace-uri() = '" + OAUTH2_PROVIDER_NAMESPACE_URI + "' and local-name() = 'config']");
     element.setAttribute("config-ref", cfg.getAttributeValue("name"));

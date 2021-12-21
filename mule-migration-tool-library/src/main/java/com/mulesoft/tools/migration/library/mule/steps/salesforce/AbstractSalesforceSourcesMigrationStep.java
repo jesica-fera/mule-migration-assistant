@@ -34,7 +34,7 @@ public abstract class AbstractSalesforceSourcesMigrationStep extends AbstractApp
   }
 
   @Override
-  public void execute(Element mule3Source, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element mule3Source, MigrationReport report) throws RuntimeException {
     addNameSpace(SalesforceUtils.MULE4_SALESFORCE_NAMESPACE,
                  SalesforceUtils.MULE4_SALESFORCE_SCHEMA_LOCATION, mule3Source.getDocument());
     mule4Source = new Element(getMule4Name(), SalesforceUtils.MULE4_SALESFORCE_NAMESPACE);

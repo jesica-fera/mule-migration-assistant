@@ -36,7 +36,7 @@ public class JsonXsltTransformer extends AbstractApplicationModelMigrationStep i
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("json.xslt", element, element);
     getApplicationModel().addNameSpace(CORE_EE_NAMESPACE, EE_NAMESPACE_SCHEMA, element.getDocument());
     element.removeContent();

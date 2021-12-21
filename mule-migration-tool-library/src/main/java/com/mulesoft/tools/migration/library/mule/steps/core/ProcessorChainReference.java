@@ -31,7 +31,7 @@ public class ProcessorChainReference extends AbstractApplicationModelMigrationSt
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("flow-ref");
     object.setAttribute("name", object.getAttributeValue("ref"));
     object.removeAttribute("ref");

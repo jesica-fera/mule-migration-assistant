@@ -51,7 +51,7 @@ public class OAuth2ProviderConfig extends AbstractApplicationModelMigrationStep 
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     getApplicationModel().addNameSpace(OAUTH2_PROVIDER_NAMESPACE,
                                        "http://www.mulesoft.org/schema/mule/oauth2-provider/current/mule-oauth2-provider.xsd",
                                        element.getDocument());

@@ -50,7 +50,7 @@ public class SftpInboundEndpoint extends AbstractSftpEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("listener");
     object.setNamespace(SFTP_NAMESPACE);
     addMigrationAttributeToElement(object, new Attribute("isMessageSource", "true"));

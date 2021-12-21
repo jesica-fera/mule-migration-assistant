@@ -39,7 +39,7 @@ public class SmtpsOutboundEndpoint extends SmtpOutboundEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Optional<Element> smtpsConnector;
     if (object.getAttribute("connector-ref") != null) {
       smtpsConnector = Optional.of(getConnector(object.getAttributeValue("connector-ref")));
@@ -47,7 +47,7 @@ public class SmtpsOutboundEndpoint extends SmtpOutboundEndpoint {
       smtpsConnector = getDefaultConnector();
     }
 
-    super.execute(object, report);
+    super.executeMigration(object, report);
 
     Element smtpsConnection = getApplicationModel()
         .getNode("/*/*[namespace-uri() = '" + EMAIL_NAMESPACE.getURI() + "' and local-name() = 'smtp-config' and @name = '"

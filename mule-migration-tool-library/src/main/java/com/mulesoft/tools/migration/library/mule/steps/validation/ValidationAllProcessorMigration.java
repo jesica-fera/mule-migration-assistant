@@ -34,7 +34,7 @@ public class ValidationAllProcessorMigration extends AbstractApplicationModelMig
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Element parentElement = element.getParentElement();
     for (Element child : new ArrayList<>(element.getChildren())) {
       child.detach();

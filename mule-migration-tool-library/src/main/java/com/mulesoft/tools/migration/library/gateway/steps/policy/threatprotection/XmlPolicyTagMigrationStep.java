@@ -45,7 +45,7 @@ public class XmlPolicyTagMigrationStep extends AbstractThreatProtectionMigration
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     new ThreatProtectionPomContributionMigrationStep(true).execute(getApplicationModel().getPomModel().get(), migrationReport);
     replaceNamespace(element, XML_THREAT_PROTECTION_NAMESPACE, XML_THREAT_PROTECTION_XSI_SCHEMA_LOCATION_URI_MULE4,
                      XML_THREAT_PROTECTION_XSI_SCHEMA_LOCATION_URI_MULE4_XSD);

@@ -41,7 +41,7 @@ public class CacheScope extends AbstractApplicationModelMigrationStep implements
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     migrateExpression(element.getAttribute("filterExpression"), expressionMigrator);
 
     if (element.getAttribute("filter-ref") != null) {

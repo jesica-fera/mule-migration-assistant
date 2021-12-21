@@ -49,7 +49,7 @@ public class HttpConnectorListener extends AbstractHttpConnectorMigrationStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     httpListenerLib(getApplicationModel());
 
     addMigrationAttributeToElement(object, new Attribute("isMessageSource", "true"));

@@ -34,8 +34,8 @@ public class OauthUsernamePasswordConfiguration extends AbstractSalesforceConfig
   }
 
   @Override
-  public void execute(Element mule3Config, MigrationReport report) throws RuntimeException {
-    super.execute(mule3Config, report);
+  public void executeMigration(Element mule3Config, MigrationReport report) throws RuntimeException {
+    super.executeMigration(mule3Config, report);
 
     XmlDslUtils.addElementAfter(mule4Config, mule3Config);
     mule3Config.getParentElement().removeContent(mule3Config);

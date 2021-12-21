@@ -38,8 +38,8 @@ public class UpsertOperation extends AbstractSalesforceOperationMigrationStep im
   }
 
   @Override
-  public void execute(Element mule3Operation, MigrationReport report) throws RuntimeException {
-    super.execute(mule3Operation, report);
+  public void executeMigration(Element mule3Operation, MigrationReport report) throws RuntimeException {
+    super.executeMigration(mule3Operation, report);
     addNameSpace(CORE_EE_NAMESPACE, EE_NAMESPACE_SCHEMA, mule3Operation.getDocument());
     resolveAttributes(mule3Operation, mule4Operation);
 

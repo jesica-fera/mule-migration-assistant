@@ -39,7 +39,7 @@ public class HttpsOutboundEndpoint extends HttpOutboundEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Optional<Element> httpsConnector;
     if (object.getAttribute("connector-ref") != null) {
       httpsConnector = Optional.of(getConnector(object.getAttributeValue("connector-ref")));
@@ -47,7 +47,7 @@ public class HttpsOutboundEndpoint extends HttpOutboundEndpoint {
       httpsConnector = getDefaultConnector();
     }
 
-    super.execute(object, report);
+    super.executeMigration(object, report);
 
     Element httpsRequesterConnection = getApplicationModel()
         .getNode("/*/*[namespace-uri()='" + HTTP_NAMESPACE_URI + "' and local-name()='request-config' and @name = '"

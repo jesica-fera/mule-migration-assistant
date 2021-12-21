@@ -40,7 +40,7 @@ public abstract class AbstractSalesforceConfigurationMigrationStep extends Abstr
   }
 
   @Override
-  public void execute(Element mule3Config, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element mule3Config, MigrationReport report) throws RuntimeException {
     addNameSpace(SalesforceUtils.MULE4_SALESFORCE_NAMESPACE,
                  SalesforceUtils.MULE4_SALESFORCE_SCHEMA_LOCATION, mule3Config.getDocument());
 

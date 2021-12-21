@@ -35,7 +35,7 @@ public class KeepElementsAtBottomOfFlow extends AbstractApplicationModelMigratio
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.getAttributes()
         .stream()
         .filter(att -> att.getNamespace().equals(MIGRATION_NAMESPACE) && att.getName().equals("lastElement"))
@@ -46,5 +46,10 @@ public class KeepElementsAtBottomOfFlow extends AbstractApplicationModelMigratio
     Element flow = getContainerElement(element);
     element.detach();
     addElementToBottom(flow, element);
+  }
+
+  @Override
+  protected boolean reportMetrics() {
+    return false;
   }
 }

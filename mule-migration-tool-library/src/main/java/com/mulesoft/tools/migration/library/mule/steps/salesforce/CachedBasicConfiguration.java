@@ -38,8 +38,8 @@ public class CachedBasicConfiguration extends AbstractSalesforceConfigurationMig
   }
 
   @Override
-  public void execute(Element mule3CachedBasicConfig, MigrationReport report) throws RuntimeException {
-    super.execute(mule3CachedBasicConfig, report);
+  public void executeMigration(Element mule3CachedBasicConfig, MigrationReport report) throws RuntimeException {
+    super.executeMigration(mule3CachedBasicConfig, report);
 
     XmlDslUtils.addElementAfter(mule4Config, mule3CachedBasicConfig);
     mule3CachedBasicConfig.getParentElement().removeContent(mule3CachedBasicConfig);

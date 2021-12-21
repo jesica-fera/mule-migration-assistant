@@ -33,7 +33,7 @@ public class MessageChunkSplitter extends AbstractSplitter {
   }
 
   @Override
-  public void execute(Element splitter, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element splitter, MigrationReport report) throws RuntimeException {
     report.report("splitter.messageChunk", splitter, splitter);
     getMatchingAggregatorElement(splitter).ifPresent(
                                                      a -> {

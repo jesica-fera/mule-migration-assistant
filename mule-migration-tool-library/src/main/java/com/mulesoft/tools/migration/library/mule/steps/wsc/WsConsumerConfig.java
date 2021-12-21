@@ -51,7 +51,7 @@ public class WsConsumerConfig extends AbstractApplicationModelMigrationStep impl
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Namespace wscNamespace = Namespace.getNamespace("wsc", "http://www.mulesoft.org/schema/mule/wsc");
     getApplicationModel().addNameSpace(wscNamespace.getPrefix(), wscNamespace.getURI(),
                                        "http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd");

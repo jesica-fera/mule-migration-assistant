@@ -35,7 +35,7 @@ public class ForEachExpressions extends AbstractApplicationModelMigrationStep im
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Attribute expression = element.getAttribute(EXPRESSION_ATTRIBUTE);
     if (expression != null) {
       String migratedExpression = expressionMigrator.migrateExpression(expression.getValue(), true, element);

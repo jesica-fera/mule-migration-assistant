@@ -34,7 +34,7 @@ public class JsonMapper extends AbstractApplicationModelMigrationStep implements
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("json.mapper", element, element.getParentElement());
     element.detach();
   }

@@ -125,7 +125,7 @@ public class SlaBasedAlgorithmMigrationStep extends AbstractThrottlingMigrationS
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     checkThrottlingSLAPolicy(element, migrationReport);
     addConfigElement(element);
     addOperationElements(element, migrationReport);

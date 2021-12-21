@@ -34,7 +34,7 @@ public class ValidationI18NMigration extends AbstractApplicationModelMigrationSt
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Element parentElement = element.getParentElement();
     if (parentElement.getName().equals("config")) {
       element.setName("i18-n");

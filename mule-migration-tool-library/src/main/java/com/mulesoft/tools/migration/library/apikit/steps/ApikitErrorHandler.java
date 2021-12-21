@@ -35,7 +35,7 @@ public class ApikitErrorHandler extends AbstractApikitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     final List<Element> mappings = element.getChildren("mapping", element.getNamespace());
 
     final List<Element> errorMappings = mappings.stream()

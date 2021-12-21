@@ -31,8 +31,8 @@ public class SubscribeTopicSource extends AbstractSalesforceSourcesMigrationStep
   }
 
   @Override
-  public void execute(Element mule3Source, MigrationReport report) throws RuntimeException {
-    super.execute(mule3Source, report);
+  public void executeMigration(Element mule3Source, MigrationReport report) throws RuntimeException {
+    super.executeMigration(mule3Source, report);
     resolveAttributes(mule3Source, mule4Source);
 
     XmlDslUtils.addElementAfter(mule4Source, mule3Source);

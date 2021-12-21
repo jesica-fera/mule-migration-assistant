@@ -62,7 +62,7 @@ public class Poll extends AbstractOSMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       changeNodeName("", POLL_NEW_NAME)
           .apply(element);

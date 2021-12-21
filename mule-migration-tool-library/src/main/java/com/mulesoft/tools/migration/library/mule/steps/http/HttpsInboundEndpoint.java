@@ -41,7 +41,7 @@ public class HttpsInboundEndpoint extends HttpInboundEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     addMigrationAttributeToElement(object, new Attribute("isMessageSource", "true"));
 
     Element httpsConnector = null;
@@ -54,7 +54,7 @@ public class HttpsInboundEndpoint extends HttpInboundEndpoint {
       }
     }
 
-    super.execute(object, report);
+    super.executeMigration(object, report);
 
     handleHttpsListenerConfig(getApplicationModel(), object, report, httpsConnector);
   }

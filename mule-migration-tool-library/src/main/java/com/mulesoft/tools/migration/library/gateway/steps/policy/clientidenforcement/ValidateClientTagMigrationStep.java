@@ -73,7 +73,7 @@ public class ValidateClientTagMigrationStep extends FilterTagMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     if (element.getAttribute(BASIC_AUTH_ENABLED_ATTR_NAME) != null) {
       if (element.getAttributeValue(BASIC_AUTH_ENABLED_ATTR_NAME).equals(TRUE)) {
         element.setName(VALIDATE_BASIC_AUTH_ENCODED_CLIENT_TAG_NAME);

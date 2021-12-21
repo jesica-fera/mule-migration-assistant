@@ -31,7 +31,7 @@ public class CustomFilter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("filters.replacedWithValidations", element, element);
 
     addValidationsModule(element.getDocument());

@@ -28,7 +28,7 @@ public class BtiXaCachingConnectionFactory extends AbstractApplicationModelMigra
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     if (object.getAttribute("minPoolSize") != null
         || object.getAttribute("maxPoolSize") != null
         || object.getAttribute("maxIdleTime") != null) {

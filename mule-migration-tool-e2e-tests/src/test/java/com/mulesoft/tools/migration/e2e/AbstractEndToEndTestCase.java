@@ -168,8 +168,9 @@ public abstract class AbstractEndToEndTestCase {
   }
 
   private void normalizeFilePath(JsonElement report) {
-    if (report.isJsonArray()) {
-      report.getAsJsonArray().forEach(e -> {
+    String messagesKey = "detailedMessages";
+    if (report.isJsonObject() && report.getAsJsonObject().has(messagesKey)) {
+      report.getAsJsonObject().get(messagesKey).getAsJsonArray().forEach(e -> {
         String filePathKey = "filePath";
         if (e.isJsonObject() && e.getAsJsonObject().has(filePathKey)) {
           String filePath = e.getAsJsonObject().get(filePathKey).getAsString();

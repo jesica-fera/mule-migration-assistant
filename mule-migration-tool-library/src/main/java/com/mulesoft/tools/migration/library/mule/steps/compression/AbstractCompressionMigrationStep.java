@@ -26,7 +26,7 @@ public abstract class AbstractCompressionMigrationStep extends AbstractApplicati
       getNamespace("compression", "http://www.mulesoft.org/schema/mule/compression");
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.setNamespace(COMPRESSION_NAMESPACE);
     element.setName(getOperationName());
     element.addContent(getStrategyElement(getStrategyName()));

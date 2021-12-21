@@ -30,7 +30,7 @@ public class DataMapper extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     report.report("expressions.datamapper", object, object);
   }
 }

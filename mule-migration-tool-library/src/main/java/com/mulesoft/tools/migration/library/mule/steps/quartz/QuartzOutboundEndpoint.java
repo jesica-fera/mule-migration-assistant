@@ -40,7 +40,7 @@ public class QuartzOutboundEndpoint extends AbstractApplicationModelMigrationSte
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     report.report("quartz.outboundEndpoint", object, object.getParentElement());
 
     Element endpointPollingJob = object.getChild("scheduled-dispatch-job", QUARTZ_NS);

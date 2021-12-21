@@ -33,7 +33,7 @@ public class SoapkitFault extends AbstractSoapkitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) {
+  public void executeMigration(Element element, MigrationReport report) {
     replaceSlashesByBackSlashes(element, "config-ref");
     migrateFaultType(element, report);
   }

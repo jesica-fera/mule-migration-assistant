@@ -38,7 +38,7 @@ public class CxfModuleNamespaceMigrator extends AbstractApplicationModelMigratio
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     getApplicationModel().getPomModel().get().addDependency(new DependencyBuilder()
         .withGroupId("com.mulesoft.mule.modules")
         .withArtifactId("mule-compatibility-module")

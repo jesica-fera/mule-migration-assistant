@@ -81,7 +81,7 @@ public abstract class AbstractSplitter extends AbstractApplicationModelMigration
   }
 
   @Override
-  public void execute(Element splitter, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element splitter, MigrationReport report) throws RuntimeException {
     SplitterAggregatorInfo splitterAggregatorInfo = new SplitterAggregatorInfo(splitter, getApplicationModel());
     List<ReportEntry> reports = new LinkedList<>();
     Element forEachElement = null;

@@ -41,7 +41,7 @@ public class TransactionalScope extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       final boolean xa = element != null && element.getName().equals("xa-transactional");
       final Element transformed = changeNodeName("", "try")

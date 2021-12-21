@@ -39,7 +39,7 @@ public class FileTransformers extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     if (object.getAttribute("name") != null) {
       getApplicationModel().getNodes("//mule:transformer[@ref = '" + object.getAttributeValue("name") + "']")
           .forEach(t -> t.detach());

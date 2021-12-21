@@ -36,7 +36,7 @@ public class BatchStep extends AbstractApplicationModelMigrationStep implements 
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Attribute acceptPolicy = object.getAttribute("accept-policy");
     if (acceptPolicy != null) {
       acceptPolicy.setName("acceptPolicy");

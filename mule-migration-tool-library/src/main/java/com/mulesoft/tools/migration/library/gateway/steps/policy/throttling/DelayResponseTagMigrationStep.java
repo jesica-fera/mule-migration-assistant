@@ -23,7 +23,7 @@ public class DelayResponseTagMigrationStep extends AbstractThrottlingMigrationSt
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.removeContent();
     element.detach();
   }

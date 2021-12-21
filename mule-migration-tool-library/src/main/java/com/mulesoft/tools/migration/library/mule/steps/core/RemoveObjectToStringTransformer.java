@@ -33,7 +33,7 @@ public class RemoveObjectToStringTransformer extends AbstractApplicationModelMig
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     if (element != null && element.getParentElement() == element.getDocument().getRootElement()) {
       getApplicationModel().getNodes("//mule:transformer[@ref='" + element.getAttributeValue("name") + "']")
           .forEach(t -> t.detach());

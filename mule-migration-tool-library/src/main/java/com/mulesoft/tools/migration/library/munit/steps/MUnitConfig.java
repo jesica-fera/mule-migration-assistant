@@ -40,7 +40,7 @@ public class MUnitConfig extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       File munitFile = new File(element.getDocument().getBaseURI());
       changeAttribute(ATTRIBUTE_NAME, empty(), of(FilenameUtils.getBaseName(munitFile.getName()))).apply(element);

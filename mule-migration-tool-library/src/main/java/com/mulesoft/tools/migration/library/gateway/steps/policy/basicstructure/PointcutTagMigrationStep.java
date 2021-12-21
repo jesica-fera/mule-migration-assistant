@@ -31,7 +31,7 @@ public class PointcutTagMigrationStep extends AbstractBasicStructureMigrationSte
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     List<Element> children = element.getChildren();
     if (!children.isEmpty()) {
       children.stream().forEach(e -> {

@@ -46,7 +46,7 @@ public class BatchJob extends AbstractApplicationModelMigrationStep implements E
   }
 
   @Override
-  public void execute(Element originalBatchJob, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element originalBatchJob, MigrationReport report) throws RuntimeException {
     Element batchJob = new Element("job", BATCH_NAMESPACE);
     setAttributes(originalBatchJob, batchJob);
 

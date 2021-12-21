@@ -33,7 +33,7 @@ public class SecurityManager extends AbstractSpringMigratorStep {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(SPRING_NAMESPACE);
     for (Element provider : object.getChildren("delegate-security-provider", SPRING_SECURITY_NAMESPACE)) {
       provider.setNamespace(SPRING_NAMESPACE);

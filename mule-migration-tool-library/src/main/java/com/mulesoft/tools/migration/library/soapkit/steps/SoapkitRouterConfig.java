@@ -60,7 +60,7 @@ public class SoapkitRouterConfig extends AbstractSoapkitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) {
+  public void executeMigration(Element element, MigrationReport report) {
     soapkitLib(getApplicationModel());
 
     final String originalConfigName = element.getAttributeValue("name");

@@ -49,7 +49,7 @@ public class HttpTransformers extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     if ("request-wildcard-filter".equals(object.getName())) {
       addValidationDependency(getApplicationModel().getPomModel().get());
       addValidationNamespace(object.getDocument());

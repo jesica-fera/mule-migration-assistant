@@ -48,7 +48,7 @@ public class FtpInboundEndpoint extends AbstractFtpEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("listener");
     object.setNamespace(FTP_NAMESPACE);
     addMigrationAttributeToElement(object, new Attribute("isMessageSource", "true"));

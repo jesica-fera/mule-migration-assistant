@@ -125,6 +125,7 @@ public class MelToDwExpressionMigrator implements ExpressionMigrator {
       migratedExpression = migratedExpression.replaceFirst("%dw 2\\.0\n---", "").trim();
     }
 
+    report.melExpressionSuccess(unwrappedExpression);
     return escapeUnderscores(migratedExpression);
   }
 

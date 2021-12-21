@@ -26,7 +26,7 @@ public class BlacklistTagMigrationStep extends AbstractIpFilterMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     migrateBlacklistWhitelistElement(element, CONFIG_REF_ATTR_VALUE);
   }
 }

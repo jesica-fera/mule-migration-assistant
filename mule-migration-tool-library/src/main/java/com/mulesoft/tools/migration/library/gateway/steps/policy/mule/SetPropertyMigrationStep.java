@@ -61,7 +61,7 @@ public class SetPropertyMigrationStep extends PolicyMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     if (getRootElement(element).getName().equals(POLICY_TAG_NAME)) {
       addNamespaces(getRootElement(element));
       Element parentElement = element.getParentElement();

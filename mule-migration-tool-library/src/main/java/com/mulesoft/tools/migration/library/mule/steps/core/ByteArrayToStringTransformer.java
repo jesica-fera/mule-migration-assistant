@@ -32,7 +32,7 @@ public class ByteArrayToStringTransformer extends AbstractApplicationModelMigrat
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Element parentElement = object.getParentElement();
     object.detach();
     report.report("expressionTransformer.deprecated", object, parentElement);

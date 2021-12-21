@@ -33,7 +33,7 @@ public class MessageFilterReference extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     getApplicationModel().getNodeOptional("/*/mule:message-filter[@name = '" + element.getAttributeValue("ref") + "']")
         .ifPresent(globalFilter -> {
           globalFilter.setAttribute("globalProcessed", "true", Namespace.getNamespace("migration", "migration"));

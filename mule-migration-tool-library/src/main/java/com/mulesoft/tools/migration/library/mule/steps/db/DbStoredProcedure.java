@@ -36,7 +36,7 @@ public class DbStoredProcedure extends AbstractDbOperationMigrator {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     migrateSql(object);
     migrateInputParamTypes(object);
     migrateInputParams(object);

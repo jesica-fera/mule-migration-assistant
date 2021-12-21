@@ -39,7 +39,7 @@ public class HttpStaticResource extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(HTTP_NAMESPACE);
     object.setName("load-static-resource");
     if (object.getAttribute("resourceBase") != null) {

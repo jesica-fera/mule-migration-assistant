@@ -35,7 +35,7 @@ public class ApikitRouterConfig extends AbstractApikitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) {
+  public void executeMigration(Element element, MigrationReport report) {
     // Add new attribures
     element.setAttribute("outboundHeadersMapName", "outboundHeaders");
     element.setAttribute("httpStatusVarName", "httpStatus");

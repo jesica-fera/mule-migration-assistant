@@ -41,7 +41,7 @@ public class AmqpOutboundEndpoint extends AbstractAmqpEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Element tx = object.getChild("transaction", AMQP_NAMESPACE);
     while (tx != null) {
       object.setAttribute("transactionalAction", mapTransactionalAction(tx.getAttributeValue("action"), report, tx, object));

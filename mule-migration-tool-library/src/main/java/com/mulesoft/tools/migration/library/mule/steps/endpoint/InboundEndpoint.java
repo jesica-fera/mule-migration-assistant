@@ -63,7 +63,7 @@ public class InboundEndpoint extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.getChildren("property", CORE_NAMESPACE).forEach(p -> {
       object.setAttribute(p.getAttributeValue("key"), p.getAttributeValue("value"));
     });

@@ -32,7 +32,7 @@ public class OSRetrieve extends AbstractOSMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     migrateOS(element);
 
     element.removeAttribute("targetScope");

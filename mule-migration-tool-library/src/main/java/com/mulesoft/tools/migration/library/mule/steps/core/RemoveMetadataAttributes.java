@@ -35,7 +35,7 @@ public class RemoveMetadataAttributes extends AbstractApplicationModelMigrationS
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("transform.studioCustomTypes", element, element);
     element.getAttributes()
         .stream()

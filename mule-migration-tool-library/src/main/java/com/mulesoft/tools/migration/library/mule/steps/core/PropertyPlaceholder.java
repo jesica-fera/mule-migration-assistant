@@ -38,7 +38,7 @@ public class PropertyPlaceholder extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
 
     Attribute propsLocation = element.getAttribute("location");
     if (propsLocation != null) {

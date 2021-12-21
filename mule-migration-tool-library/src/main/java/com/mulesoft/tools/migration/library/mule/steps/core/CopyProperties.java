@@ -36,7 +36,7 @@ public class CopyProperties extends AbstractApplicationModelMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     addCompatibilityNamespace(element.getDocument());
     report.report("message.copyProperties", element, element);
     element.setNamespace(COMPATIBILITY_NAMESPACE);

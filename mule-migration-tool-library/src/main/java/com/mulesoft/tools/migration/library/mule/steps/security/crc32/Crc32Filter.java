@@ -42,7 +42,7 @@ public class Crc32Filter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     addCryptoNamespace(element.getDocument());
 
     element.setName("validate-checksum");

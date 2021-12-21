@@ -53,7 +53,7 @@ public class VmOutboundEndpoint extends AbstractVmEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     Element tx = object.getChild("transaction", VM_NAMESPACE);
     while (tx != null) {
       object.setAttribute("transactionalAction", mapTransactionalAction(tx.getAttributeValue("action"), report, tx, object));

@@ -31,7 +31,7 @@ public class IpTagMigrationStep extends AbstractIpFilterMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.setNamespace(IP_FILTER_NAMESPACE);
     final List<Content> content = detachContent(element.getContent());
     if (content.size() > 0) {

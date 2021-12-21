@@ -36,7 +36,7 @@ public class FlowRef extends AbstractApplicationModelMigrationStep implements Ex
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     if (getExpressionMigrator().isWrapped(element.getAttributeValue("name"))) {
       // replace chars in DW
       migrateExpression(element.getAttribute("name"), expressionMigrator);

@@ -57,7 +57,7 @@ public class JmsOutboundEndpoint extends AbstractJmsEndpoint {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     jmsTransportLib(getApplicationModel());
 
     Element tx = object.getChild("transaction", JMS_NAMESPACE);

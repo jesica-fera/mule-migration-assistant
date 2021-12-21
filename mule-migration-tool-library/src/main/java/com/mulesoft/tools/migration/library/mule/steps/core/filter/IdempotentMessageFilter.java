@@ -32,7 +32,7 @@ public class IdempotentMessageFilter extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.setName("idempotent-message-validator");
     handleFilter(element);
   }

@@ -44,7 +44,7 @@ public class MessagePropertiesTransformer extends AbstractApplicationModelMigrat
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     addCompatibilityNamespace(element.getDocument());
     if (element.getAttribute("scope") == null) {
       report.report("message.outboundProperties", element, element.getParentElement());

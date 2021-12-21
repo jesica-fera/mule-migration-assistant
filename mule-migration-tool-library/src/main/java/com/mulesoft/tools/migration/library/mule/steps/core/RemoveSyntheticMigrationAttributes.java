@@ -34,7 +34,7 @@ public class RemoveSyntheticMigrationAttributes extends AbstractApplicationModel
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.getAttributes()
         .stream()
         .filter(att -> att.getNamespace().equals(MIGRATION_NAMESPACE))
@@ -42,4 +42,10 @@ public class RemoveSyntheticMigrationAttributes extends AbstractApplicationModel
         .forEach(att -> att.detach());
     element.removeNamespaceDeclaration(MIGRATION_NAMESPACE);
   }
+
+  @Override
+  protected boolean reportMetrics() {
+    return false;
+  }
+
 }

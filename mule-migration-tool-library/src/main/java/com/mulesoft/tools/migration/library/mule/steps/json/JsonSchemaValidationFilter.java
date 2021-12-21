@@ -35,7 +35,7 @@ public class JsonSchemaValidationFilter extends AbstractFilterMigrator implement
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.setName("validate-schema");
     Attribute schemaLocations = element.getAttribute("schemaLocations");
     schemaLocations.setName("schema");

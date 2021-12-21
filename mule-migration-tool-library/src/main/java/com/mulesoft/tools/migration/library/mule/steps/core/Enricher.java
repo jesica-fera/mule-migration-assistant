@@ -55,7 +55,7 @@ public class Enricher extends AbstractApplicationModelMigrationStep implements E
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Element flow = getContainerElement(element);
     final String flowName = flow.getAttributeValue("name") != null ? flow.getAttributeValue("name")
         : flow.getParentElement().getName() + StringUtils.capitalize(flow.getName());

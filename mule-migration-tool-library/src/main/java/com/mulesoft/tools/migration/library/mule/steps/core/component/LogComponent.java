@@ -33,7 +33,7 @@ public class LogComponent extends AbstractApplicationModelMigrationStep {
 
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setName("logger");
     if (!object.getChildren().isEmpty()) {
       report.report("components.interceptors", object, object);

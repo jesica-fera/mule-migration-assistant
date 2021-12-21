@@ -47,9 +47,9 @@ public class ExpressionSplitter extends AbstractSplitter implements ExpressionMi
   }
 
   @Override
-  public void execute(Element splitter, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element splitter, MigrationReport report) throws RuntimeException {
     if (!reportOldAttributesAndFail(splitter, report)) {
-      super.execute(splitter, report);
+      super.executeMigration(splitter, report);
     } else {
       getMatchingAggregatorElement(splitter).ifPresent(SplitterAggregatorUtils::setAggregatorAsProcessed);
     }

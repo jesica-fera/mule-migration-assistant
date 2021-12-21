@@ -22,7 +22,7 @@ import org.jdom2.Namespace;
 public class JmsDomainConnector extends JmsConnector {
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     final Namespace jmsConnectorNamespace = getNamespace("jms", "http://www.mulesoft.org/schema/mule/jms");
     getApplicationModel().addNameSpace(jmsConnectorNamespace, "http://www.mulesoft.org/schema/mule/jms/current/mule-jms.xsd",
                                        object.getDocument());

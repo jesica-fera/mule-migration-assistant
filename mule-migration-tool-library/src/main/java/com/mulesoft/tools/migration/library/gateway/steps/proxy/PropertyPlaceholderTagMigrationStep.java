@@ -38,7 +38,7 @@ public class PropertyPlaceholderTagMigrationStep extends GatewayMigrationStep {
 
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     Element root = getRootElement(element);
     if (root != null) {
       root.removeNamespaceDeclaration(EXPRESSION_LANGUAGE_NAMESPACE);

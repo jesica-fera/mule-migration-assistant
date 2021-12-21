@@ -33,7 +33,7 @@ public class JsonPolicyTagMigrationStep extends AbstractThreatProtectionMigratio
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     new ThreatProtectionPomContributionMigrationStep(false).execute(getApplicationModel().getPomModel().get(), migrationReport);
     replaceNamespace(element, JSON_THREAT_PROTECTION_NAMESPACE, JSON_THREAT_PROTECTION_XSI_SCHEMA_LOCATION_URI_MULE4,
                      JSON_THREAT_PROTECTION_XSI_SCHEMA_LOCATION_URI_MULE4_XSD);

@@ -195,7 +195,7 @@ public class MigrationJob implements Executable {
     HTMLReport htmlReport = new HTMLReport(report.getReportEntries(), reportPath.toFile(), this.getRunnerVersion());
     htmlReport.printReport();
     if (jsonReportEnabled) {
-      JSONReport jsonReport = new JSONReport(report.getReportEntries(), reportPath.toFile(), outputProject);
+      JSONReport jsonReport = new JSONReport(report, reportPath.toFile(), outputProject);
       jsonReport.printReport();
     }
   }

@@ -30,7 +30,7 @@ public class BeforeTagMigrationStep extends AbstractBasicStructureMigrationStep 
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     final List<Content> cloneContentList = detachContent(element.getContent());
     Element source = setUpHttpPolicy(element, true, migrationReport);
     if (source.getChild(PolicyMigrationStep.TRY_TAG_NAME, MULE_4_CORE_NAMESPACE_NO_PREFIX) == null) {

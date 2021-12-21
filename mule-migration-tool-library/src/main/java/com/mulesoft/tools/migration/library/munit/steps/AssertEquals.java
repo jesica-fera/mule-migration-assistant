@@ -35,7 +35,7 @@ public class AssertEquals extends AbstractAssertionMigration {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     try {
       changeNodeName("munit-tools", "assert-that")
           .andThen(changeAttribute("expectedValue", of("expression"), empty()))

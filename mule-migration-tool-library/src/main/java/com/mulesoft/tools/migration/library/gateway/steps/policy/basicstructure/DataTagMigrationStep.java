@@ -25,7 +25,7 @@ public class DataTagMigrationStep extends AbstractBasicStructureMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     migrationReport.report("basicStructure.dataMigrationStep", element, element);
     detachContent(element.getContent());
     setUpHttpPolicy(element, true, migrationReport);

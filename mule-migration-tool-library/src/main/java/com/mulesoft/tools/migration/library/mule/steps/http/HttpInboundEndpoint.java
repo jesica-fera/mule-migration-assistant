@@ -65,7 +65,7 @@ public class HttpInboundEndpoint extends AbstractApplicationModelMigrationStep
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     httpListenerLib(getApplicationModel());
 
     object.setNamespace(HTTP_NAMESPACE);

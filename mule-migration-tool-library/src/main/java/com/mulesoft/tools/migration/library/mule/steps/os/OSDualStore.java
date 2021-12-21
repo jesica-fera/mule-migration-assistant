@@ -25,7 +25,7 @@ public class OSDualStore extends AbstractOSMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     report.report("os.dualStore", element, element);
   }
 }

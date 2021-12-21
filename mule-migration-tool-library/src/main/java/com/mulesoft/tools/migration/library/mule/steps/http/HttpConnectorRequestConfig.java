@@ -46,7 +46,7 @@ public class HttpConnectorRequestConfig extends AbstractHttpConnectorMigrationSt
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     object.setNamespace(HTTP_NAMESPACE);
 
     if ("request-config".equals(object.getName())) {

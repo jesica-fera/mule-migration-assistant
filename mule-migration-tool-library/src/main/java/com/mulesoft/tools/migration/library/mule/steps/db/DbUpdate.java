@@ -32,7 +32,7 @@ public class DbUpdate extends AbstractDbOperationMigrator {
   }
 
   @Override
-  public void execute(Element object, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element object, MigrationReport report) throws RuntimeException {
     migrateSql(object);
 
     if ("true".equals(object.getAttributeValue("bulkMode"))) {

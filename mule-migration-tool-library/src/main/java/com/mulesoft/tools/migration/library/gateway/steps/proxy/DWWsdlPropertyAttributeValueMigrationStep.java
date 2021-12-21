@@ -90,7 +90,7 @@ public class DWWsdlPropertyAttributeValueMigrationStep extends GatewayMigrationS
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     new ProxyPomContributionMigrationStep(false).execute(getApplicationModel().getPomModel().get(), migrationReport);
     element.getAttributes().stream()
         .filter(attr -> attr.getValue().startsWith(WSDL_PROPERTY_ATTRIBUTE_VALUE_START))

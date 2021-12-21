@@ -62,7 +62,7 @@ public class ProtectTagMigrationStep extends AbstractThreatProtectionMigrationSt
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     Boolean isJsonPolicy = isJsonPolicy(element, migrationReport);
     if (isJsonPolicy != null) {
       if (isJsonPolicy) {

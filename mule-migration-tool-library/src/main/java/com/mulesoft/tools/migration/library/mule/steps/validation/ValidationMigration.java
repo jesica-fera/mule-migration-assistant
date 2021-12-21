@@ -54,7 +54,7 @@ public class ValidationMigration extends AbstractApplicationModelMigrationStep i
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     migrateExpression(element.getAttribute("email"), getExpressionMigrator());
     migrateExpression(element.getAttribute("ip"), getExpressionMigrator());
     migrateExpression(element.getAttribute("url"), getExpressionMigrator());

@@ -11,6 +11,7 @@ import org.jdom2.Element;
 
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 /**
  * An interface to feed the migration report.
@@ -88,6 +89,48 @@ public interface MigrationReport<T> {
    * @param processedElements the amount of elements processed
    */
   void addProcessedElements(int processedElements);
+
+  String getProjectType();
+
+  String getProjectName();
+
+  List<String> getConnectorNames();
+
+  void addConnector(String name, boolean success);
+
+  void addConnectorSuccess(String name);
+
+  void addConnectorFailure(String name);
+
+  Integer getComponentSuccessCount();
+
+  Integer getComponentFailureCount();
+
+  int getComponentFailureCount(Element element);
+
+  Map<String, int[]> getComponents();
+
+  void addComponent(Element element, boolean success);
+
+  void addComponentSuccess(Element element);
+
+  void addComponentFailure(Element element);
+
+  Integer getDwTransformsSuccessCount();
+
+  Integer getDwTransformsFailureCount();
+
+  void incrementDwTransformsSuccess();
+
+  void incrementDwTransformsFailure();
+
+  Integer getMelExpressionsSuccessLineCount();
+
+  Integer getMelExpressionsFailureLineCount();
+
+  void melExpressionSuccess(String melExpression);
+
+  void melExpressionFailure(String melExpression);
 
   /**
    * Update file reference on report

@@ -34,7 +34,7 @@ public class JsonValidateSchema extends AbstractApplicationModelMigrationStep im
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     element.getAttribute("schemaLocation").setName("schema");
   }
 

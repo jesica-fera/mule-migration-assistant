@@ -26,7 +26,7 @@ public class CleanupAttributesMigrationStep extends AbstractBasicStructureMigrat
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     element.removeAttribute(PolicyMigrationStep.POLICY_NAME);
   }
 }

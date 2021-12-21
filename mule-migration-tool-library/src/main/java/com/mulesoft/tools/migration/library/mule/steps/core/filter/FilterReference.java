@@ -33,7 +33,7 @@ public class FilterReference extends AbstractFilterMigrator {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     Element globalFilter = getApplicationModel().getNode("/*/*[@name = '" + element.getAttributeValue("ref") + "']");
     globalFilter.setAttribute("globalProcessed", "true", Namespace.getNamespace("migration", "migration"));
     Element clonedFilter = globalFilter.clone();

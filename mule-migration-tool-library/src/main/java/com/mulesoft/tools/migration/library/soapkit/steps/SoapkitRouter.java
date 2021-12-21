@@ -32,7 +32,7 @@ public class SoapkitRouter extends AbstractSoapkitMigrationStep {
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) {
+  public void executeMigration(Element element, MigrationReport report) {
     replaceSlashesByBackSlashes(element, "config-ref");
 
     addElement(element, "message", "#[payload]");

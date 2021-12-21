@@ -188,7 +188,7 @@ public class FixedTimeFrameAlgorithmMigrationStep extends AbstractThrottlingMigr
   }
 
   @Override
-  public void execute(Element element, MigrationReport migrationReport) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport migrationReport) throws RuntimeException {
     boolean isRateLimitMigration = isRateLimitMigration(element, migrationReport);
     addConfigElement(element, isRateLimitMigration);
     addOperationElements(element, isRateLimitMigration, migrationReport);
