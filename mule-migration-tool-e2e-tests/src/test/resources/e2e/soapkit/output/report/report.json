@@ -1,9 +1,11 @@
 {
   "projectType": "MULE_THREE_APPLICATION",
   "projectName": "input",
-  "connectorsUsed": [],
-  "numberOfMuleComponents": 16,
-  "numberOfMuleComponentsMigrated": 16,
+  "connectorsUsed": [
+    "org.mule.connectors:mule-http-connector:1.5.25"
+  ],
+  "numberOfMuleComponents": 15,
+  "numberOfMuleComponentsMigrated": 14,
   "componentDetails": {
     ":mule": [
       1,
@@ -17,11 +19,7 @@
       3,
       0
     ],
-    "ee:transform": [
-      1,
-      0
-    ],
-    "http:listener-connection": [
+    "dw:transform-message": [
       1,
       0
     ],
@@ -33,9 +31,9 @@
       1,
       0
     ],
-    ":set-variable": [
-      1,
-      0
+    ":set-attachment": [
+      0,
+      1
     ],
     "apikit-soap:config": [
       1,
@@ -46,10 +44,14 @@
       0
     ]
   },
-  "numberOfMELExpLines": 0,
-  "numberOfMELExpLinesMigrated": 0,
+  "numberOfMELExpressions": 0,
+  "numberOfMELExpressionsMigrated": 0,
+  "numberOfMELExpressionLines": 0,
+  "numberOfMELExpressionLinesMigrated": 0,
   "numberOfDWTransformations": 1,
   "numberOfDWTransformationsMigrated": 1,
+  "numberOfDWTransformationLines": 9,
+  "numberOfDWTransformationLinesMigrated": 9,
   "detailedMessages": [
     {
       "level": "WARN",

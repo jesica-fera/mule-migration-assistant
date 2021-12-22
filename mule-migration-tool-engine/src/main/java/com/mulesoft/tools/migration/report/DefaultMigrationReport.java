@@ -11,6 +11,7 @@ import static java.util.Collections.list;
 
 import com.mulesoft.tools.migration.exception.MigrationAbortException;
 import com.mulesoft.tools.migration.project.ProjectType;
+import com.mulesoft.tools.migration.project.model.pom.PomModel;
 import com.mulesoft.tools.migration.report.html.model.ReportEntryModel;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
 import com.mulesoft.tools.migration.step.util.XmlDslUtils;
@@ -20,18 +21,23 @@ import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.jdom2.Comment;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 /**
@@ -41,6 +47,8 @@ import org.yaml.snakeyaml.Yaml;
  * @since 1.0.0
  */
 public class DefaultMigrationReport implements MigrationReport<ReportEntryModel> {
+
+  private static final Logger logger = LoggerFactory.getLogger(DefaultMigrationReport.class);
 
   public static final Pattern WORD_MESSAGE_REPLACEMENT_EXPRESSION = Pattern.compile("\\{\\w*\\}");
   private transient Map<String, Map<String, Map<String, Object>>> possibleEntries;
@@ -57,14 +65,16 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   private final int SUCCESS_IDX = 0;
   private final int FAILURE_IDX = 1;
-  private final Map<String, int[]> connectors = new LinkedHashMap<>();
   private final Map<String, int[]> components = new LinkedHashMap<>();
+  private final Set<String> connectors = new LinkedHashSet<>();
   private int dwTransformsSuccess;
   private int dwTransformsFailure;
-  private int melLinesSuccess;
-  private int melLinesFailure;
+  private int dwTransformLinesSuccess;
+  private int dwTransformLinesFailure;
   private int melExpressionsSuccess;
   private int melExpressionsFailure;
+  private int melLinesSuccess;
+  private int melLinesFailure;
 
 
   public DefaultMigrationReport() {
@@ -134,25 +144,28 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
       }
 
       if (reportEntries.add(reportEntry)) {
-        if (elementToComment != null) {
-          elementToComment.addContent(i++, new Comment("Migration " + level.name() + ": " + message));
+        logger.debug("Report entry added: {} :: {} :: {} -> {}", entryKey, level, elementToComment.getName(), message);
+        elementToComment.addContent(i++, new Comment("Migration " + level.name() + ": " + sanitize(message)));
 
-          if (documentationLinks.length > 0) {
-            elementToComment.addContent(i++, new Comment("    For more information refer to:"));
+        if (documentationLinks.length > 0) {
+          elementToComment.addContent(i++, new Comment("    For more information refer to:"));
 
-            for (String link : documentationLinks) {
-              elementToComment.addContent(i++, new Comment("        * " + link));
-            }
+          for (String link : documentationLinks) {
+            elementToComment.addContent(i++, new Comment("        * " + link));
           }
+        }
 
-          if (element != elementToComment) {
-            XmlDslUtils.removeNestedComments(element);
-            elementToComment.addContent(i++, new Comment(outp.outputString(element)));
-          }
+        if (element != elementToComment) {
+          XmlDslUtils.removeNestedComments(element);
+          elementToComment.addContent(i, new Comment(outp.outputString(element)));
         }
       }
     }
 
+  }
+
+  private String sanitize(String message) {
+    return message.replaceAll("--", " - - ");
   }
 
   @Override
@@ -185,6 +198,12 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     return new ArrayList<>(this.reportEntries);
   }
 
+  @Override
+  public List<ReportEntryModel> getReportEntries(Level... levels) {
+    List<Level> levelList = Arrays.asList(levels);
+    return reportEntries.stream().filter(e -> levelList.contains(e.getLevel())).collect(Collectors.toList());
+  }
+
   public double getSuccessfulMigrationRatio() {
     return successfulMigrationRatio;
   }
@@ -195,23 +214,14 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   @Override
   public List<String> getConnectorNames() {
-    return new ArrayList<>(connectors.keySet());
+    return new ArrayList<>(connectors);
   }
 
   @Override
-  public void addConnector(String name, boolean success) {
-    connectors.putIfAbsent(name, new int[] {0, 0});
-    connectors.get(name)[success ? SUCCESS_IDX : FAILURE_IDX] += 1;
-  }
-
-  @Override
-  public void addConnectorSuccess(String name) {
-    addConnector(name, true);
-  }
-
-  @Override
-  public void addConnectorFailure(String name) {
-    addConnector(name, false);
+  public void addConnectors(PomModel pomModel) {
+    pomModel.getDependencies().stream()
+        .filter(d -> d.getGroupId().contains("connector") || d.getArtifactId().contains("connector"))
+        .forEach(d -> connectors.add(String.format("%s:%s:%s", d.getGroupId(), d.getArtifactId(), d.getVersion())));
   }
 
   @Override
@@ -222,11 +232,6 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   @Override
   public Integer getComponentFailureCount() {
     return components.values().stream().map(v -> v[FAILURE_IDX]).reduce(0, Integer::sum);
-  }
-
-  @Override
-  public int getComponentFailureCount(Element element) {
-    return components.getOrDefault(getComponentKey(element), new int[] {0, 0})[FAILURE_IDX];
   }
 
   @Override
@@ -247,11 +252,13 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   @Override
   public void addComponentSuccess(Element element) {
+    logger.debug(">>>>> addComponentSuccess {}", element.getName());
     addComponent(element, true);
   }
 
   @Override
   public void addComponentFailure(Element element) {
+    logger.debug("XXXXX addComponentFailure {}", element.getName());
     addComponent(element, false);
   }
 
@@ -266,13 +273,39 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   }
 
   @Override
-  public void incrementDwTransformsSuccess() {
-    this.dwTransformsSuccess++;
+  public Integer getDwTransformsSuccessLineCount() {
+    return dwTransformLinesSuccess;
   }
 
   @Override
-  public void incrementDwTransformsFailure() {
+  public Integer getDwTransformsFailureLineCount() {
+    return dwTransformLinesFailure;
+  }
+
+  @Override
+  public void dwTransformsSuccess(String script) {
+    this.dwTransformsSuccess++;
+    int lines = countLines(script);
+    this.dwTransformLinesSuccess += lines;
+    logger.debug("  --->>> dwTransformsSuccess - {} lines", lines);
+  }
+
+  @Override
+  public void dwTransformsFailure(String script) {
     this.dwTransformsFailure++;
+    int lines = countLines(script);
+    this.dwTransformLinesFailure += lines;
+    logger.debug("  ---XXX dwTransformsFailure - {} lines", lines);
+  }
+
+  @Override
+  public Integer getMelExpressionsSuccessCount() {
+    return melExpressionsSuccess;
+  }
+
+  @Override
+  public Integer getMelExpressionsFailureCount() {
+    return melExpressionsFailure;
   }
 
   @Override
@@ -288,13 +321,17 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   @Override
   public void melExpressionSuccess(String melExpression) {
     this.melExpressionsSuccess++;
-    this.melLinesSuccess += countLines(melExpression);
+    int lines = countLines(melExpression);
+    this.melLinesSuccess += lines;
+    logger.debug("  -->> melExpressionSuccess - {} lines -- {}", lines, melExpression);
   }
 
   @Override
   public void melExpressionFailure(String melExpression) {
     this.melExpressionsFailure++;
-    this.melLinesFailure += countLines(melExpression);
+    int lines = countLines(melExpression);
+    this.melLinesFailure += lines;
+    logger.debug("  --XX melExpressionFailure - {} lines -- {}", lines, melExpression);
   }
 
   private int countLines(String melExpression) {

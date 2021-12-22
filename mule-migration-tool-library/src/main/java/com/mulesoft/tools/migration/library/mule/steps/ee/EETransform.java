@@ -161,15 +161,16 @@ public class EETransform extends AbstractApplicationModelMigrationStep {
   }
 
   private void migrateDWScript(Element element, MigrationReport report) {
-    if (!StringUtils.isEmpty(element.getText())) {
+    String sourceScript = element.getText();
+    if (!StringUtils.isEmpty(sourceScript)) {
       try {
-        String migratedScript = migrateDWToV2(element.getText());
+        String migratedScript = migrateDWToV2(sourceScript);
         element.removeContent();
         setText(element, migratedScript);
-        report.incrementDwTransformsSuccess();
+        report.dwTransformsSuccess(sourceScript);
       } catch (Exception ex) {
-        report.report("dataWeave.migrationErrorScript", element, element, element.getText(), ex.getMessage());
-        report.incrementDwTransformsFailure();
+        report.report("dataWeave.migrationErrorScript", element, element, sourceScript, ex.getMessage());
+        report.dwTransformsFailure(sourceScript);
       }
     } else if (element.getAttribute("resource") != null) {
       Attribute resourceAttr = element.getAttribute("resource");

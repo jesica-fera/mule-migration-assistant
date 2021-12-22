@@ -27,7 +27,7 @@ public class ${mainTaskClassName}ApplicationModelContribution extends AbstractAp
   }
 
   @Override
-  public void execute(Element element, MigrationReport report) throws RuntimeException {
+  public void executeMigration(Element element, MigrationReport report) throws RuntimeException {
     // Perform here all the necessary changes in the element
   }
 

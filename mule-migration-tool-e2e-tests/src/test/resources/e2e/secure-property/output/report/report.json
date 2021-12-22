@@ -1,9 +1,11 @@
 {
   "projectType": "MULE_THREE_APPLICATION",
   "projectName": "input",
-  "connectorsUsed": [],
-  "numberOfMuleComponents": 7,
-  "numberOfMuleComponentsMigrated": 7,
+  "connectorsUsed": [
+    "org.mule.connectors:mule-http-connector:1.5.25"
+  ],
+  "numberOfMuleComponents": 6,
+  "numberOfMuleComponentsMigrated": 6,
   "componentDetails": {
     "secure-property-placeholder:config": [
       1,
@@ -21,10 +23,6 @@
       1,
       0
     ],
-    "http:listener-connection": [
-      1,
-      0
-    ],
     "http:listener-config": [
       1,
       0
@@ -34,10 +32,14 @@
       0
     ]
   },
-  "numberOfMELExpLines": 0,
-  "numberOfMELExpLinesMigrated": 0,
+  "numberOfMELExpressions": 0,
+  "numberOfMELExpressionsMigrated": 0,
+  "numberOfMELExpressionLines": 0,
+  "numberOfMELExpressionLinesMigrated": 0,
   "numberOfDWTransformations": 0,
   "numberOfDWTransformationsMigrated": 0,
+  "numberOfDWTransformationLines": 0,
+  "numberOfDWTransformationLinesMigrated": 0,
   "detailedMessages": [
     {
       "level": "WARN",

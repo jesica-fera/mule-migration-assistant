@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:json="http://www.mulesoft.org/schema/mule/json" xmlns:objectstore="http://www.mulesoft.org/schema/mule/objectstore" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:schedulers="http://www.mulesoft.org/schema/mule/schedulers" xmlns:tracking="http://www.mulesoft.org/schema/mule/ee/tracking" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:spring="http://www.springframework.org/schema/beans" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/schedulers http://www.mulesoft.org/schema/mule/schedulers/current/mule-schedulers.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/tracking http://www.mulesoft.org/schema/mule/ee/tracking/current/mule-tracking-ee.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd
+http://www.mulesoft.org/schema/mule/objectstore http://www.mulesoft.org/schema/mule/objectstore/current/mule-objectstore.xsd
+http://www.mulesoft.org/schema/mule/json http://www.mulesoft.org/schema/mule/json/current/mule-json.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd">
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="${https.port}" protocol="HTTPS" doc:name="HTTP Listener Configuration" >
+        <tls:context>
+            <tls:key-store path="serverKeystore" keyPassword="${ks.key.password}" password="${ks.password}"/>
+        </tls:context>
+    </http:listener-config>
+    <http:request-config name="HTTP_Request_Configuration" protocol="HTTPS" host="${jenkins.host}" port="443" basePath="${jenkins.path}" doc:name="HTTP Request Configuration" responseTimeout="60000">
+        <http:basic-authentication username="${jenkins.username}" password="${jenkins.token}" preemptive="true"/>
+    </http:request-config>
+    <objectstore:config name="ObjectStore__Connector" partition="tests" objectStore-ref="_defaultUserObjectStore" persistent="true" doc:name="ObjectStore: Connector"/>
+    <flow name="update">
+        <flow-ref name="currentStatus" doc:name="current status"/>
+        <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object"/>
+        <dw:transform-message metadata:id="24f2d87f-3271-4251-8aba-9bd2dc926f11" doc:name="update status">
+            <dw:input-payload/>
+            <dw:input-variable variableName="owner"/>
+            <dw:input-variable variableName="test"/>
+            <dw:input-variable variableName="assignee"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+%var toFullClassName = (test) -> test.package ++ '.' ++ test.class
+%var toName = (test) -> test.class ++ '.' ++ test.name
+%var matchesTest = (test) -> toName(test) == flowVars.test when toFullClassName(test) != test.name otherwise test.class == flowVars.test
+---
+{
+	failures: payload.failures,
+	tests: payload.tests map ((test , indexOfTest) -> {
+		package: test.package,
+		class: test.class,
+		name: test.name,
+		age: test.age,
+		detail: test.detail,
+		assignee: flowVars.assignee when ((flowVars.assignee != null) and matchesTest(test)) otherwise test.assignee,
+		issue: flowVars.issue when ((flowVars.issue != null) and matchesTest(test)) otherwise test.issue
+	})
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <object-to-byte-array-transformer doc:name="Object to Byte Array"/>
+        <objectstore:store config-ref="ObjectStore__Connector" key="#[flowVars.branch]" value-ref="#[payload]" doc:name="new status" overwrite="true"/>
+    </flow>
+    <flow name="assign">
+                <dw:transform-message doc:name="find test - assignee -branch">
+            <dw:set-variable variableName="branch"><![CDATA[%dw 1.0
+%output application/java
+---
+'${jenkins.build}' when ((sizeOf flowVars.words) < 6) otherwise flowVars.words[5]]]></dw:set-variable>
+            <dw:set-variable variableName="assignee"><![CDATA[%dw 1.0
+%output application/java
+---
+flowVars.words[3]]]></dw:set-variable>
+            <dw:set-variable variableName="test"><![CDATA[%dw 1.0
+%output application/java
+---
+flowVars.words[1]]]></dw:set-variable>
+        </dw:transform-message>
+        <flow-ref name="validateBranch" doc:name="validate branch"/>
+        <logger message="Assigning #[flowVars.test] to #[flowVars.assignee] in #[flowVars.branch]" level="INFO" doc:name="assigning"/>
+        <flow-ref name="update" doc:name="update test data"/>
+        <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Assigned #[flowVars.test] to #[flowVars.assignee] in #[flowVars.branch].&quot;}" mimeType="application/json" doc:name="success"/>
+        <rollback-exception-strategy doc:name="Rollback Exception Strategy">
+            <logger message="Error assigning #[flowVars.test]." level="INFO" doc:name="error"/>
+            <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Error occurred assigning #[flowVars.test] to #[flowVars.assignee] in #[flowVars.branch].&quot;}" doc:name="assign error" mimeType="application/json"/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="track">
+        <dw:transform-message doc:name="find test - issue -branch">
+            <dw:set-variable variableName="branch"><![CDATA[%dw 1.0
+%output application/java
+---
+'${jenkins.build}' when ((sizeOf flowVars.words) < 6) otherwise flowVars.words[5]]]></dw:set-variable>
+            <dw:set-variable variableName="issue"><![CDATA[%dw 1.0
+%output application/java
+---
+flowVars.words[3]]]></dw:set-variable>
+            <dw:set-variable variableName="test"><![CDATA[%dw 1.0
+%output application/java
+---
+flowVars.words[1]]]></dw:set-variable>
+        </dw:transform-message>
+        <flow-ref name="validateBranch" doc:name="validate branch"/>
+        <logger message="Tracking #[flowVars.test] with #[flowVars.issue] in #[flowVars.branch]" level="INFO" doc:name="tracking"/>
+        <flow-ref name="update" doc:name="update test data"/>
+        <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Tracking #[flowVars.test] with #[flowVars.issue] in #[flowVars.branch].&quot;}" doc:name="success" mimeType="application/json"/>
+        <rollback-exception-strategy doc:name="Rollback Exception Strategy">
+            <logger message="Error tracking #[flowVars.test]." level="INFO" doc:name="error"/>
+            <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Error occurred tracking #[flowVars.test] with #[flowVars.issue] in #[flowVars.branch].&quot;}" doc:name="tracking error" mimeType="application/json"/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="status">
+        <flow-ref name="currentStatus" doc:name="current status"/>
+        <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object"/>
+        <dw:transform-message metadata:id="9f6ceac9-d93e-405d-9fb9-8960213349f3" doc:name="pretty slack print">
+            <dw:input-payload/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+%var upRange = min [flowVars.range, payload.failures]
+%var bottomRange = flowVars.range - 10
+%var toFullClassName = (test) -> test.package ++ '.' ++ test.class
+%var toFullName = (test) -> (test.class ++ '.' ++ test.name) when toFullClassName(test) != test.name otherwise test.class
+%var nameUrl = (test) -> test.name when toFullClassName(test) != test.name otherwise (test.name replace "." with "_")
+%var jobUrl = 'https://${jenkins.host}${jenkins.path}job/' ++ flowVars.branch ++ '/lastSuccessfulBuild/testReport' 
+%var toUrl = (test) -> jobUrl ++ '/junit/' ++ test.package ++ '/' ++ test.class ++ '/' ++ nameUrl(test) ++ '/'
+%var toJiraUrl = (test) -> ('<https://www.mulesoft.org/jira/browse/' ++ test.issue ++ '|' ++ test.issue ++ '>') when (test.issue != null) otherwise 'None'
+%var withinLimit = payload.failures < ${storage.limit}
+%var resultsPresent = payload.failures > 0 and withinLimit
+%var prevButton = 
+	{
+        "name": "prev",
+        "text": "Back",
+        "type": "button",
+        "value": "previous"
+	} when bottomRange > 0 otherwise {}
+%var nextButton = 
+	{
+        "name": "next",
+        "text": "Next",
+        "type": "button",
+        "value": "next"
+	} when payload.failures > flowVars.range and withinLimit otherwise {}
+%var navigation = 
+	{
+		fallback: 'See others...',
+		title: "Navigate...",
+		callback_id: flowVars.range as :string,
+		actions : [] ++ [prevButton] ++ [nextButton]
+		
+	} when (payload.failures > flowVars.range and withinLimit) or (bottomRange > 0) otherwise {}
+%var textMessage = 
+	('There are ' ++ payload.failures as :string ++ ' failures on branch `' ++ flowVars.branch as :string ++ '`. Showing tests ' ++ (bottomRange + 1) as :string ++ ' through ' ++ upRange as :string ++ '.')
+	when resultsPresent
+	otherwise 
+		(':tada: There are no failures on branch `' ++ flowVars.branch as :string ++ '` :tada:' 
+			when withinLimit
+			otherwise 'There are ' ++ payload.failures ++ ' failures on branch `' ++ flowVars.branch as :string ++ '` :scream:. See latest build <' ++ jobUrl ++ '|results> for details.'
+		) 
+---
+{
+	response_type: 'in_channel',
+	text: textMessage,
+	attachments: 
+		(payload.tests[bottomRange to (upRange - 1)] map ((test , indexOfTest) -> {
+		fallback: toFullName(test),
+		title: toFullName(test) ++ ' (' ++ test.age ++ ')',
+		title_link: toUrl(test),
+		color: 'warning',
+		callback_id: toFullName(test),
+		fields: 
+		[
+			{
+				title: 'Assignee',
+				value: test.assignee,
+				short: true
+			},
+			{
+				title: 'Issue',
+				value: toJiraUrl(test),
+				short: true
+			}
+		] when test.assignee != null otherwise [],
+		actions : 
+		[
+	        {
+	            "name": "assignTo",
+	            "text": "Assign to...",
+	            "type": "select",
+	            "options": 
+	            [
+	                {
+	                    "text": "Anita",
+	                    "value": "afelisatti"
+	                },
+	                {
+	                    "text": "Ale I.",
+	                    "value": "alejandro.iannucci"
+	                },
+	                {
+	                    "text": "Ale M.",
+	                    "value": "alejandro.garcia"
+	                },
+	                {
+	                    "text": "Ale N.",
+	                    "value": "alejandro.nosenzo"
+	                },
+	                {
+	                    "text": "Baca",
+	                    "value": "juan.baca"
+	                },
+	                {
+	                    "text": "Balbi",
+	                    "value": "pablo.balbi"
+	                },
+	                {
+	                    "text": "Eugenia",
+	                    "value": "eugenia.mariotti"
+	                },
+	                {
+	                    "text": "Fabian",
+	                    "value": "fabian.gonzalez"
+	                },
+	                {
+	                    "text": "Guille",
+	                    "value": "guillermo.fernandes"
+	                },
+	                {
+	                    "text": "Juani",
+	                    "value": "juan.desimoni"
+	                },
+	                {
+	                    "text": "Lucho",
+	                    "value": "luciano.raineri"
+	                },
+	                {
+	                    "text": "MG",
+	                    "value": "mariano.gonzalez"
+	                },
+	                {
+	                    "text": "Martin",
+	                    "value": "martin.buchwald"
+	                },
+	                {
+	                    "text": "Nico",
+	                    "value": "ndinucci"
+	                },
+	                {
+	                    "text": "PLG",
+	                    "value": "pablo.lagreca"
+	                },
+	                {
+	                    "text": "Rodro",
+	                    "value": "rodrigo.merino"
+	                },
+	                {
+	                    "text": "Steve",
+	                    "value": "esteban.wasinger"
+	                }
+                   ] 
+                },
+    			{
+                    "name": "assignSelf",
+                    "text": "Assign to me :raised_hand:",
+                    "type": "button",
+                    "value": "self"
+            	}
+         ] when test.assignee == null otherwise []
+	}) when resultsPresent otherwise []) ++ [navigation]
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <rollback-exception-strategy doc:name="Rollback Exception Strategy">
+            <logger message="Error retrieving #[flowVars.branch] status." level="INFO" doc:name="error"/>
+            <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Error retrieving #[flowVars.branch] status.&quot;}" doc:name="status error" mimeType="application/json"/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="interactiveInbound">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/interactive" doc:name="HTTP"/>
+        <set-payload value="#[payload.payload]" mimeType="application/json" doc:name="payload"/>
+        <dw:transform-message doc:name="find action - branch">
+            <dw:set-variable variableName="action"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.actions[0].name]]></dw:set-variable>
+            <dw:set-variable variableName="branch"><![CDATA[%dw 1.0
+%output application/java
+---
+(payload.original_message.text splitBy '`')[1]]]></dw:set-variable>
+        </dw:transform-message>
+        <logger message="Incoming Slack action '#[flowVars.action]' for branch '#[flowVars.branch]'" level="INFO" doc:name="action"/>
+        <choice doc:name="Choice">
+            <when expression="#[&quot;next&quot;.equals(action)]">
+                <dw:transform-message doc:name="next range">
+                    <dw:set-variable variableName="range"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.original_message.attachments[-1].callback_id as :number + 10]]></dw:set-variable>
+                </dw:transform-message>
+            </when>
+            <when expression="#[&quot;prev&quot;.equals(action)]">
+                <dw:transform-message doc:name="previous range">
+                    <dw:set-variable variableName="range"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.original_message.attachments[-1].callback_id as :number - 10]]></dw:set-variable>
+                </dw:transform-message>
+            </when>
+            <otherwise>
+                <dw:transform-message metadata:id="f2c88ee3-fe7b-4d8f-a232-5a1c3d2059fc" doc:name="find test - assignee - range">
+                    <dw:input-payload/>
+                    <dw:set-variable variableName="test"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.callback_id]]></dw:set-variable>
+                    <dw:set-variable variableName="assignee"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.user.name when payload.actions[0].name == 'assignSelf' otherwise payload.actions[0].selected_options[0].value]]></dw:set-variable>
+                    <dw:set-variable variableName="range"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.original_message.attachments[-1].callback_id when payload.original_message.attachments[-1].title == 'Navigate...' otherwise 10]]></dw:set-variable>
+                </dw:transform-message>
+                <logger message="Assigning #[flowVars.test] to #[flowVars.assignee] in #[flowVars.branch]" level="INFO" doc:name="assingning"/>
+                <flow-ref name="update" doc:name=" update test data"/>
+            </otherwise>
+        </choice>
+        <logger message="Success, returning #[flowVars.branch] status with range: #[flowVars.range]" level="INFO" doc:name="sucess"/>
+        <flow-ref name="status" doc:name="status"/>
+    </flow>
+    <flow name="slackInbound">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/slack" allowedMethods="POST" doc:name="HTTP"/>
+        <set-payload value="#[payload]" mimeType="application/java" doc:name="application/java"/>
+        <logger message="Incoming Slack request: #[payload.text]" level="INFO" doc:name="request"/>
+        <dw:transform-message doc:name="extract words">
+            <dw:set-variable variableName="words"><![CDATA[%dw 1.0
+%output application/java
+---
+payload.text splitBy ' ']]></dw:set-variable>
+        </dw:transform-message>
+        <choice doc:name="Choice">
+            <when expression="#[payload.text.startsWith('status')]">
+                <dw:transform-message doc:name="find range - branch">
+                    <dw:set-variable variableName="range"><![CDATA[%dw 1.0
+%output application/java
+---
+10]]></dw:set-variable>
+                    <dw:set-variable variableName="branch"><![CDATA[%dw 1.0
+%output application/java
+---
+'${jenkins.build}' when ((sizeOf flowVars.words) < 2) otherwise flowVars.words[1]]]></dw:set-variable>
+                </dw:transform-message>
+                <flow-ref name="validateBranch" doc:name="validate branch"/>
+                <flow-ref name="status" doc:name="status"/>
+            </when>
+            <when expression="#[payload.text.startsWith('assign')]">
+                <flow-ref name="assign" doc:name="assign"/>
+            </when>
+            <when expression="#[payload.text.startsWith('track')]">
+                <flow-ref name="track" doc:name="track"/>
+            </when>
+            <when expression="#[payload.text.startsWith('refresh')]">
+                <dw:transform-message doc:name="find branch">
+                    <dw:set-variable variableName="branch"><![CDATA[%dw 1.0
+%output application/java
+---
+'${jenkins.build}' when ((sizeOf flowVars.words) < 2) otherwise flowVars.words[1]]]></dw:set-variable>
+                </dw:transform-message>
+                <flow-ref name="validateBranch" doc:name="validate branch"/>
+                <flow-ref name="refresh" doc:name="refresh"/>
+                <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Successfully triggered `#[flowVars.branch]` refresh. Results should be available shortly.&quot;}" doc:name="success" mimeType="application/json"/>
+            </when>
+            <when expression="#[payload.text.startsWith('clear')]">
+                <flow-ref name="clear" doc:name="clear"/>
+            </when>
+            <otherwise>
+                <dw:transform-message metadata:id="48b2301a-3139-45ea-9b65-aee1ace3b027" doc:name="usage">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	response_type: 'ephemeral',
+	text: 'Use `status {branch}` to see current failures in a branch, `assign {testClass.testName} to {user} in {branch}` to assign a failing test to someone or `track {testClass.testName} with {issue} in {branch}` to associate a test to its JIRA ticket. If no branch is defined, `${jenkins.build}` will be used.'
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </otherwise>
+        </choice>
+        <logger message="Slack command handled successfully." level="INFO" doc:name="success"/>
+        <catch-exception-strategy doc:name="Catch Exception Strategy">
+            <set-payload value="#[payload]" doc:name="propagate payload"/>
+        </catch-exception-strategy>
+    </flow>
+    <flow name="refresh">
+        <flow-ref name="currentStatus" doc:name="current status"/>
+        <async doc:name="Async">
+            <flow-ref name="async-refresh" doc:name="refresh"/>
+        </async>
+    </flow>
+    <flow name="async-refresh">
+        <logger message="Sending request to Jenkins" level="INFO" doc:name="sending"/>
+        <set-payload value="something" mimeType="application/xml" doc:name="mime type workaround"/>
+        <http:request config-ref="HTTP_Request_Configuration" path="job/#[flowVars.branch]/lastSuccessfulBuild/testReport/api/xml" method="GET" doc:name="get jenkins status">
+            <http:request-builder>
+                <http:query-param paramName="xpath" value="//case[status[text()='FAILED' or text()='REGRESSION']]"/>
+                <http:query-param paramName="wrapper" value="tests"/>
+            </http:request-builder>
+        </http:request>
+        <dw:transform-message doc:name="analize results" metadata:id="4ad5cc5d-6986-4a4f-84eb-aa053619305f">
+            <dw:input-payload/>
+            <dw:input-variable variableName="previousStatus"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+%var toParts = (case) -> case.className splitBy "."
+%var toClass = (case) -> toParts(case)[(sizeOf toParts(case)) - 1]
+%var toPackage = (case) -> (toParts(case) - toClass(case)) reduce ($$ ++ '.' ++ $)
+%var previousAssignee = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).assignee[0] default null
+%var previousIssue = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).issue[0] default null
+%var failuresCount = sizeOf payload.tests when payload.tests != "" otherwise 0
+---
+{
+	failures: failuresCount,
+	tests: (payload.tests.*case map ((case , indexOfCase) -> {
+		package : toPackage(case),
+		class: toClass(case),
+		name: case.name,
+		age: case.age,
+		assignee: previousAssignee(case),
+		issue: previousIssue(case)
+	})) when failuresCount > 0 and failuresCount < ${storage.limit} otherwise []
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <logger message="Success, updating stored data." level="INFO" doc:name="updating"/>
+        <object-to-byte-array-transformer doc:name="Object to Byte Array"/>
+        <objectstore:store config-ref="ObjectStore__Connector" key="#[flowVars.branch]" value-ref="#[payload]" overwrite="true" doc:name="new status"/>
+        <logger message="Successfully refreshed #[flowVars.branch] status." level="INFO" doc:name="success"/>
+        <rollback-exception-strategy doc:name="Rollback Exception Strategy">
+            <logger message="Error refreshing branch #[flowVars.branch]." level="INFO" doc:name="error"/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="currentStatus">
+        <objectstore:contains config-ref="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="check status"/>
+                <choice doc:name="Choice">
+            <when expression="#[payload]">
+                <logger message="Retrieving stored status for branch #[flowVars.branch]" level="INFO" doc:name="retrieving"/>
+                <objectstore:retrieve config-ref="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="previous status"/>
+                <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object"/>
+            </when>
+            <otherwise>
+                <logger message="Generating default status." level="INFO" doc:name="default"/>
+                <dw:transform-message doc:name="default empty status" metadata:id="192bb15d-70b2-4306-8bd3-9a2ae378c08d">
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	failures: 0,
+	tests: []
+}]]></dw:set-payload>
+                </dw:transform-message>
+            </otherwise>
+        </choice>
+        <dw:transform-message doc:name="previous status">
+            <dw:set-variable variableName="previousStatus"><![CDATA[%dw 1.0
+%output application/java
+---
+payload]]></dw:set-variable>
+        </dw:transform-message>
+    </flow>
+    <flow name="validateBranch">
+        <choice doc:name="Choice">
+            <when expression="#['${jenkins.build}'.equals(flowVars.branch)]">
+                <logger message="Default branch selected, no validation required." level="INFO" doc:name="default branch"/>
+            </when>
+            <otherwise>
+                <set-variable variableName="previousPayload" value="#[payload]" doc:name="store payload"/>
+                <set-payload value="something" mimeType="application/xml" doc:name="mime type workaround"/>
+                <http:request config-ref="HTTP_Request_Configuration" path="api/xml" method="GET" doc:name="get jenkins jobs">
+                    <http:request-builder>
+                        <http:query-param paramName="xpath" value="//job"/>
+                        <http:query-param paramName="wrapper" value="jobs"/>
+                    </http:request-builder>
+                </http:request>
+                <dw:transform-message doc:name="look for matches" metadata:id="86c1d3c9-c171-43af-bb62-f714cb5e7f33">
+                    <dw:input-payload mimeType="application/xml"/>
+                    <dw:set-payload><![CDATA[%dw 1.0
+%output application/java
+---
+payload.jobs filter ($.name == flowVars.branch)]]></dw:set-payload>
+                </dw:transform-message>
+                <validation:is-not-empty value="#[payload]" doc:name="not empty"/>
+                <set-payload value="#[flowVars.previousPayload]" doc:name="reinstate payload"/>
+            </otherwise>
+        </choice>
+        <rollback-exception-strategy doc:name="Rollback Exception Strategy">
+            <logger message="Could not validate branch #[flowVars.branch]" level="INFO" doc:name="error"/>
+            <set-payload value="{&quot;response_type&quot;: &quot;ephemeral&quot;,&quot;text&quot;: &quot;Could not validate the existence of a `#[flowVars.branch]` branch.&quot;}" mimeType="application/json" doc:name="validation failure"/>
+        </rollback-exception-strategy>
+    </flow>
+    <flow name="clear">
+        <logger message="Clearing all statuses." level="INFO" doc:name="Logger"/>
+        <objectstore:retrieve-all-keys config-ref="ObjectStore__Connector" doc:name="get branches"/>
+        <foreach doc:name="For Each">
+            <objectstore:remove config-ref="ObjectStore__Connector" key="#[payload]" doc:name="remove branch"/>
+        </foreach>
+        <dw:transform-message doc:name="success">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+---
+{
+	response_type: 'ephemeral',
+	text: 'Deleted statuses for branches: `' ++ (payload joinBy ' - ') ++ '`. Trigger a refresh to load them again.'
+}]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+</mule>

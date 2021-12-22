@@ -6,6 +6,7 @@
 package com.mulesoft.tools.migration.step.category;
 
 import com.mulesoft.tools.migration.project.ProjectType;
+import com.mulesoft.tools.migration.project.model.pom.PomModel;
 
 import org.jdom2.Element;
 
@@ -96,17 +97,11 @@ public interface MigrationReport<T> {
 
   List<String> getConnectorNames();
 
-  void addConnector(String name, boolean success);
-
-  void addConnectorSuccess(String name);
-
-  void addConnectorFailure(String name);
+  void addConnectors(PomModel pomModel);
 
   Integer getComponentSuccessCount();
 
   Integer getComponentFailureCount();
-
-  int getComponentFailureCount(Element element);
 
   Map<String, int[]> getComponents();
 
@@ -120,9 +115,17 @@ public interface MigrationReport<T> {
 
   Integer getDwTransformsFailureCount();
 
-  void incrementDwTransformsSuccess();
+  Integer getDwTransformsSuccessLineCount();
 
-  void incrementDwTransformsFailure();
+  Integer getDwTransformsFailureLineCount();
+
+  void dwTransformsSuccess(String script);
+
+  void dwTransformsFailure(String script);
+
+  Integer getMelExpressionsSuccessCount();
+
+  Integer getMelExpressionsFailureCount();
 
   Integer getMelExpressionsSuccessLineCount();
 
@@ -144,4 +147,7 @@ public interface MigrationReport<T> {
    * Returns the report entries.
    */
   List<T> getReportEntries();
+
+  List<T> getReportEntries(Level... levels);
+
 }

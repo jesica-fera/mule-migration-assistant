@@ -1,0 +1,460 @@
+{
+  "projectType": "MULE_THREE_MAVEN_APPLICATION",
+  "projectName": "input",
+  "connectorsUsed": [
+    "org.mule.connectors:mule-http-connector:1.5.25",
+    "org.mule.connectors:mule-objectstore-connector:1.2.1"
+  ],
+  "numberOfMuleComponents": 110,
+  "numberOfMuleComponentsMigrated": 110,
+  "componentDetails": {
+    ":mule": [
+      1,
+      0
+    ],
+    ":logger": [
+      19,
+      0
+    ],
+    ":catch-exception-strategy": [
+      1,
+      0
+    ],
+    ":rollback-exception-strategy": [
+      5,
+      0
+    ],
+    ":foreach": [
+      2,
+      0
+    ],
+    ":flow": [
+      11,
+      0
+    ],
+    ":flow-ref": [
+      17,
+      0
+    ],
+    ":async": [
+      1,
+      0
+    ],
+    ":choice": [
+      4,
+      0
+    ],
+    ":set-payload": [
+      13,
+      0
+    ],
+    ":set-variable": [
+      1,
+      0
+    ],
+    "dw:transform-message": [
+      17,
+      0
+    ],
+    "validation:is-not-empty": [
+      1,
+      0
+    ],
+    "http:listener-config": [
+      1,
+      0
+    ],
+    "http:request-config": [
+      1,
+      0
+    ],
+    "http:listener": [
+      2,
+      0
+    ],
+    "http:request": [
+      2,
+      0
+    ],
+    "http:query-param": [
+      4,
+      0
+    ],
+    "objectstore:config": [
+      1,
+      0
+    ],
+    "objectstore:contains": [
+      1,
+      0
+    ],
+    "objectstore:retrieve-all-keys": [
+      1,
+      0
+    ],
+    "objectstore:remove": [
+      1,
+      0
+    ],
+    "objectstore:store": [
+      2,
+      0
+    ],
+    "objectstore:retrieve": [
+      1,
+      0
+    ]
+  },
+  "numberOfMELExpressions": 54,
+  "numberOfMELExpressionsMigrated": 46,
+  "numberOfMELExpressionLines": 54,
+  "numberOfMELExpressionLinesMigrated": 46,
+  "numberOfDWTransformations": 25,
+  "numberOfDWTransformationsMigrated": 23,
+  "numberOfDWTransformationLines": 288,
+  "numberOfDWTransformationLinesMigrated": 115,
+  "detailedMessages": [
+    {
+      "level": "ERROR",
+      "key": "dataWeave.migrationErrorScript",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "Error migrating DataWeave script from DW 1.0 to DW 2.0: %dw 1.0\n%output application/json\n%var toParts \u003d (case) -\u003e case.className splitBy \".\"\n%var toClass \u003d (case) -\u003e toParts(case)[(sizeOf toParts(case)) - 1]\n%var toPackage \u003d (case) -\u003e (toParts(case) - toClass(case)) reduce ($$ ++ \u0027.\u0027 ++ $)\n%var previousAssignee \u003d (case) -\u003e (flowVars.previousStatus.tests filter (($.class \u003d\u003d toClass(case)) and ($.name \u003d\u003d case.name))).assignee[0] default null\n%var previousIssue \u003d (case) -\u003e (flowVars.previousStatus.tests filter (($.class \u003d\u003d toClass(case)) and ($.name \u003d\u003d case.name))).issue[0] default null\n%var failuresCount \u003d sizeOf payload.tests when payload.tests !\u003d \"\" otherwise 0\n---\n{\n\tfailures: failuresCount,\n\ttests: (payload.tests.*case map ((case , indexOfCase) -\u003e {\n\t\tpackage : toPackage(case),\n\t\tclass: toClass(case),\n\t\tname: case.name,\n\t\tage: case.age,\n\t\tassignee: previousAssignee(case),\n\t\tissue: previousIssue(case)\n\t})) when failuresCount \u003e 0 and failuresCount \u003c ${storage.limit} otherwise []\n}",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.methodInvocation",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.methodInvocation",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.methodInvocation",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.methodInvocation",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 0,
+      "columnNumber": 0,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "INFO",
+      "key": "os.config",
+      "lineNumber": 20,
+      "columnNumber": 104,
+      "message": "In Mule 4, you no longer need to create a Spring bean to declare an Object Store.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 39,
+      "columnNumber": 48,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 165,
+      "columnNumber": 53,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "dataWeave.migrationErrorScript",
+      "lineNumber": 168,
+      "columnNumber": 33,
+      "message": "Error migrating DataWeave script from DW 1.0 to DW 2.0: %dw 1.0\n%output application/json\n%var upRange \u003d min [flowVars.range, payload.failures]\n%var bottomRange \u003d flowVars.range - 10\n%var toFullClassName \u003d (test) -\u003e test.package ++ \u0027.\u0027 ++ test.class\n%var toFullName \u003d (test) -\u003e (test.class ++ \u0027.\u0027 ++ test.name) when toFullClassName(test) !\u003d test.name otherwise test.class\n%var nameUrl \u003d (test) -\u003e test.name when toFullClassName(test) !\u003d test.name otherwise (test.name replace \".\" with \"_\")\n%var jobUrl \u003d \u0027https://${jenkins.host}${jenkins.path}job/\u0027 ++ flowVars.branch ++ \u0027/lastSuccessfulBuild/testReport\u0027 \n%var toUrl \u003d (test) -\u003e jobUrl ++ \u0027/junit/\u0027 ++ test.package ++ \u0027/\u0027 ++ test.class ++ \u0027/\u0027 ++ nameUrl(test) ++ \u0027/\u0027\n%var toJiraUrl \u003d (test) -\u003e (\u0027\u003chttps://www.mulesoft.org/jira/browse/\u0027 ++ test.issue ++ \u0027|\u0027 ++ test.issue ++ \u0027\u003e\u0027) when (test.issue !\u003d null) otherwise \u0027None\u0027\n%var withinLimit \u003d payload.failures \u003c ${storage.limit}\n%var resultsPresent \u003d payload.failures \u003e 0 and withinLimit\n%var prevButton \u003d \n\t{\n        \"name\": \"prev\",\n        \"text\": \"Back\",\n        \"type\": \"button\",\n        \"value\": \"previous\"\n\t} when bottomRange \u003e 0 otherwise {}\n%var nextButton \u003d \n\t{\n        \"name\": \"next\",\n        \"text\": \"Next\",\n        \"type\": \"button\",\n        \"value\": \"next\"\n\t} when payload.failures \u003e flowVars.range and withinLimit otherwise {}\n%var navigation \u003d \n\t{\n\t\tfallback: \u0027See others...\u0027,\n\t\ttitle: \"Navigate...\",\n\t\tcallback_id: flowVars.range as :string,\n\t\tactions : [] ++ [prevButton] ++ [nextButton]\n\t\t\n\t} when (payload.failures \u003e flowVars.range and withinLimit) or (bottomRange \u003e 0) otherwise {}\n%var textMessage \u003d \n\t(\u0027There are \u0027 ++ payload.failures as :string ++ \u0027 failures on branch `\u0027 ++ flowVars.branch as :string ++ \u0027`. Showing tests \u0027 ++ (bottomRange + 1) as :string ++ \u0027 through \u0027 ++ upRange as :string ++ \u0027.\u0027)\n\twhen resultsPresent\n\totherwise \n\t\t(\u0027:tada: There are no failures on branch `\u0027 ++ flowVars.branch as :string ++ \u0027` :tada:\u0027 \n\t\t\twhen withinLimit\n\t\t\totherwise \u0027There are \u0027 ++ payload.failures ++ \u0027 failures on branch `\u0027 ++ flowVars.branch as :string ++ \u0027` :scream:. See latest build \u003c\u0027 ++ jobUrl ++ \u0027|results\u003e for details.\u0027\n\t\t) \n---\n{\n\tresponse_type: \u0027in_channel\u0027,\n\ttext: textMessage,\n\tattachments: \n\t\t(payload.tests[bottomRange to (upRange - 1)] map ((test , indexOfTest) -\u003e {\n\t\tfallback: toFullName(test),\n\t\ttitle: toFullName(test) ++ \u0027 (\u0027 ++ test.age ++ \u0027)\u0027,\n\t\ttitle_link: toUrl(test),\n\t\tcolor: \u0027warning\u0027,\n\t\tcallback_id: toFullName(test),\n\t\tfields: \n\t\t[\n\t\t\t{\n\t\t\t\ttitle: \u0027Assignee\u0027,\n\t\t\t\tvalue: test.assignee,\n\t\t\t\tshort: true\n\t\t\t},\n\t\t\t{\n\t\t\t\ttitle: \u0027Issue\u0027,\n\t\t\t\tvalue: toJiraUrl(test),\n\t\t\t\tshort: true\n\t\t\t}\n\t\t] when test.assignee !\u003d null otherwise [],\n\t\tactions : \n\t\t[\n\t        {\n\t            \"name\": \"assignTo\",\n\t            \"text\": \"Assign to...\",\n\t            \"type\": \"select\",\n\t            \"options\": \n\t            [\n\t                {\n\t                    \"text\": \"Anita\",\n\t                    \"value\": \"afelisatti\"\n\t                },\n\t                {\n\t                    \"text\": \"Ale I.\",\n\t                    \"value\": \"alejandro.iannucci\"\n\t                },\n\t                {\n\t                    \"text\": \"Ale M.\",\n\t                    \"value\": \"alejandro.garcia\"\n\t                },\n\t                {\n\t                    \"text\": \"Ale N.\",\n\t                    \"value\": \"alejandro.nosenzo\"\n\t                },\n\t                {\n\t                    \"text\": \"Baca\",\n\t                    \"value\": \"juan.baca\"\n\t                },\n\t                {\n\t                    \"text\": \"Balbi\",\n\t                    \"value\": \"pablo.balbi\"\n\t                },\n\t                {\n\t                    \"text\": \"Eugenia\",\n\t                    \"value\": \"eugenia.mariotti\"\n\t                },\n\t                {\n\t                    \"text\": \"Fabian\",\n\t                    \"value\": \"fabian.gonzalez\"\n\t                },\n\t                {\n\t                    \"text\": \"Guille\",\n\t                    \"value\": \"guillermo.fernandes\"\n\t                },\n\t                {\n\t                    \"text\": \"Juani\",\n\t                    \"value\": \"juan.desimoni\"\n\t                },\n\t                {\n\t                    \"text\": \"Lucho\",\n\t                    \"value\": \"luciano.raineri\"\n\t                },\n\t                {\n\t                    \"text\": \"MG\",\n\t                    \"value\": \"mariano.gonzalez\"\n\t                },\n\t                {\n\t                    \"text\": \"Martin\",\n\t                    \"value\": \"martin.buchwald\"\n\t                },\n\t                {\n\t                    \"text\": \"Nico\",\n\t                    \"value\": \"ndinucci\"\n\t                },\n\t                {\n\t                    \"text\": \"PLG\",\n\t                    \"value\": \"pablo.lagreca\"\n\t                },\n\t                {\n\t                    \"text\": \"Rodro\",\n\t                    \"value\": \"rodrigo.merino\"\n\t                },\n\t                {\n\t                    \"text\": \"Steve\",\n\t                    \"value\": \"esteban.wasinger\"\n\t                }\n                   ] \n                },\n    \t\t\t{\n                    \"name\": \"assignSelf\",\n                    \"text\": \"Assign to me :raised_hand:\",\n                    \"type\": \"button\",\n                    \"value\": \"self\"\n            \t}\n         ] when test.assignee \u003d\u003d null otherwise []\n\t}) when resultsPresent otherwise []) ++ [navigation]\n}",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.statusCode",
+      "lineNumber": 490,
+      "columnNumber": 113,
+      "message": "Avoid using an outbound property to determine the status code.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.statusCode",
+      "lineNumber": 496,
+      "columnNumber": 141,
+      "message": "Avoid using an outbound property to determine the status code.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.attributesToInboundProperties",
+      "lineNumber": 504,
+      "columnNumber": 57,
+      "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 561,
+      "columnNumber": 71,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.outboundProperties",
+      "lineNumber": 593,
+      "columnNumber": 51,
+      "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.statusCode",
+      "lineNumber": 603,
+      "columnNumber": 113,
+      "message": "Avoid using an outbound property to determine the status code.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.statusCode",
+      "lineNumber": 609,
+      "columnNumber": 141,
+      "message": "Avoid using an outbound property to determine the status code.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.attributesToInboundProperties",
+      "lineNumber": 617,
+      "columnNumber": 57,
+      "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.methodInvocation",
+      "lineNumber": 629,
+      "columnNumber": 27,
+      "message": "The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 629,
+      "columnNumber": 27,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 728,
+      "columnNumber": 48,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.outboundProperties",
+      "lineNumber": 745,
+      "columnNumber": 51,
+      "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.outboundProperties",
+      "lineNumber": 754,
+      "columnNumber": 59,
+      "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.outboundProperties",
+      "lineNumber": 778,
+      "columnNumber": 51,
+      "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.mapExpression",
+      "lineNumber": 784,
+      "columnNumber": 186,
+      "message": "Build the \u0027query-params\u0027 map with a single DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.attributesToInboundProperties",
+      "lineNumber": 793,
+      "columnNumber": 57,
+      "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 804,
+      "columnNumber": 50,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 881,
+      "columnNumber": 63,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "expressions.melToDw",
+      "lineNumber": 909,
+      "columnNumber": 82,
+      "message": "The MEL expression could not be migrated to a DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.outboundProperties",
+      "lineNumber": 920,
+      "columnNumber": 59,
+      "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "http.mapExpression",
+      "lineNumber": 925,
+      "columnNumber": 127,
+      "message": "Build the \u0027query-params\u0027 map with a single DataWeave expression.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "WARN",
+      "key": "message.attributesToInboundProperties",
+      "lineNumber": 933,
+      "columnNumber": 65,
+      "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    },
+    {
+      "level": "ERROR",
+      "key": "transform.studioCustomTypes",
+      "lineNumber": 940,
+      "columnNumber": 59,
+      "message": "Custom types defined in Studio 6 are not migrated to Studio 7.",
+      "filePath": "src/main/mule/mule-config.xml",
+      "documentationLinks": []
+    }
+  ]
+}

@@ -1,0 +1,986 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:compatibility="http://www.mulesoft.org/schema/mule/compatibility" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:tls="http://www.mulesoft.org/schema/mule/tls" xmlns:validation="http://www.mulesoft.org/schema/mule/validation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd http://www.mulesoft.org/schema/mule/validation http://www.mulesoft.org/schema/mule/validation/current/mule-validation.xsd http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd http://www.mulesoft.org/schema/mule/compatibility http://www.mulesoft.org/schema/mule/compatibility/current/mule-compatibility.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <http:listener-config name="HTTP_Listener_Configuration" doc:name="HTTP Listener Configuration">
+        <http:listener-connection protocol="HTTPS" host="0.0.0.0" port="${https.port}">
+            <tls:context>
+                <tls:key-store path="serverKeystore" keyPassword="${ks.key.password}" password="${ks.password}" />
+            </tls:context>
+        </http:listener-connection>
+    </http:listener-config>
+
+    <http:request-config name="HTTP_Request_Configuration" basePath="${jenkins.path}" doc:name="HTTP Request Configuration" responseTimeout="60000">
+        <http:request-connection protocol="HTTPS" host="${jenkins.host}" port="443">
+            <http:authentication>
+                <http:basic-authentication username="${jenkins.username}" password="${jenkins.token}" preemptive="true" />
+            </http:authentication>
+        </http:request-connection>
+    </http:request-config>
+
+    <os:object-store name="ObjectStore__Connector" persistent="true" doc:name="ObjectStore: Connector">
+        <!--Migration INFO: In Mule 4, you no longer need to create a Spring bean to declare an Object Store.-->
+        <!--    For more information refer to:-->
+        <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-connectors-objectstore#custom-object-store-->
+    </os:object-store>
+
+    <flow name="update">
+        <flow-ref name="currentStatus" doc:name="current status" />
+
+        <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object" />
+
+        <set-payload value="#[payload]" mimeType="null" />
+
+        <set-variable variableName="owner" value="#[vars.owner]" mimeType="null" />
+
+        <set-variable variableName="test" value="#[vars.test]" mimeType="null" />
+
+        <set-variable variableName="assignee" value="#[vars.assignee]" mimeType="null" />
+
+        <ee:transform doc:name="update status">
+            <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json  
+var toFullClassName = (test) -> test.package ++ "." ++ test.class
+var toName = (test) -> test.class ++ "." ++ test.name
+var matchesTest = (test) -> if (not toFullClassName(test) == test.name)
+    toName(test) == vars.test
+  else
+    test.class == vars.test
+---
+{
+  failures: payload.failures,
+  tests: payload.tests map (test, indexOfTest) -> {
+    package: test.package,
+    class: test.class,
+    name: test.name,
+    age: test.age,
+    detail: test.detail,
+    assignee: 
+      if (((not vars.assignee == null) and matchesTest(test)))
+        vars.assignee
+      else
+        test.assignee,
+    issue: 
+      if (((not vars.issue == null) and matchesTest(test)))
+        vars.issue
+      else
+        test.issue
+  }
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <object-to-byte-array-transformer doc:name="Object to Byte Array" />
+
+        <os:store objectStore="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="new status">
+            <os:value><![CDATA[#[payload]]]></os:value>
+        </os:store>
+
+    </flow>
+
+    <flow name="assign">
+        <ee:transform doc:name="find test - assignee -branch">
+            <ee:variables>
+                <ee:set-variable variableName="branch"><![CDATA[%dw 2.0
+output application/java  
+---
+if (((sizeOf(vars.words)) < 6))
+  "$($){jenkins.build}"
+else
+  vars.words[5]]]></ee:set-variable>
+                <ee:set-variable variableName="assignee">%dw 2.0
+output application/java  
+---
+vars.words[3]</ee:set-variable>
+                <ee:set-variable variableName="test">%dw 2.0
+output application/java  
+---
+vars.words[1]</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+        <flow-ref name="validateBranch" doc:name="validate branch" />
+
+        <logger message="#[&quot;Assigning $(vars.test) to $(vars.assignee) in $(vars.branch)&quot;]" level="INFO" doc:name="assigning" />
+
+        <flow-ref name="update" doc:name="update test data" />
+
+        <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Assigned $(vars.test) to $(vars.assignee) in $(vars.branch).'}&quot;]" mimeType="application/json" doc:name="success" />
+
+        <error-handler>
+            <on-error-propagate doc:name="Rollback Exception Strategy">
+                <logger message="#[&quot;Error assigning $(vars.test).&quot;]" level="INFO" doc:name="error" />
+                <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Error occurred assigning $(vars.test) to $(vars.assignee) in $(vars.branch).'}&quot;]" doc:name="assign error" mimeType="application/json" />
+            </on-error-propagate>
+        </error-handler>
+
+    </flow>
+
+    <flow name="track">
+        <ee:transform doc:name="find test - issue -branch">
+            <ee:variables>
+                <ee:set-variable variableName="branch"><![CDATA[%dw 2.0
+output application/java  
+---
+if (((sizeOf(vars.words)) < 6))
+  "$($){jenkins.build}"
+else
+  vars.words[5]]]></ee:set-variable>
+                <ee:set-variable variableName="issue">%dw 2.0
+output application/java  
+---
+vars.words[3]</ee:set-variable>
+                <ee:set-variable variableName="test">%dw 2.0
+output application/java  
+---
+vars.words[1]</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+        <flow-ref name="validateBranch" doc:name="validate branch" />
+
+        <logger message="#[&quot;Tracking $(vars.test) with $(vars.issue) in $(vars.branch)&quot;]" level="INFO" doc:name="tracking" />
+
+        <flow-ref name="update" doc:name="update test data" />
+
+        <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Tracking $(vars.test) with $(vars.issue) in $(vars.branch).'}&quot;]" doc:name="success" mimeType="application/json" />
+
+        <error-handler>
+            <on-error-propagate doc:name="Rollback Exception Strategy">
+                <logger message="#[&quot;Error tracking $(vars.test).&quot;]" level="INFO" doc:name="error" />
+                <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Error occurred tracking $(vars.test) with $(vars.issue) in $(vars.branch).'}&quot;]" doc:name="tracking error" mimeType="application/json" />
+            </on-error-propagate>
+        </error-handler>
+
+    </flow>
+
+    <flow name="status">
+        <flow-ref name="currentStatus" doc:name="current status" />
+
+        <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object" />
+
+        <set-payload value="#[payload]" mimeType="null" />
+
+        <ee:transform doc:name="pretty slack print">
+            <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+            <ee:message>
+                <ee:set-payload>
+                    <!--Migration ERROR: Error migrating DataWeave script from DW 1.0 to DW 2.0: %dw 1.0
+%output application/json
+%var upRange = min [flowVars.range, payload.failures]
+%var bottomRange = flowVars.range - 10
+%var toFullClassName = (test) -> test.package ++ '.' ++ test.class
+%var toFullName = (test) -> (test.class ++ '.' ++ test.name) when toFullClassName(test) != test.name otherwise test.class
+%var nameUrl = (test) -> test.name when toFullClassName(test) != test.name otherwise (test.name replace "." with "_")
+%var jobUrl = 'https://${jenkins.host}${jenkins.path}job/' ++ flowVars.branch ++ '/lastSuccessfulBuild/testReport' 
+%var toUrl = (test) -> jobUrl ++ '/junit/' ++ test.package ++ '/' ++ test.class ++ '/' ++ nameUrl(test) ++ '/'
+%var toJiraUrl = (test) -> ('<https://www.mulesoft.org/jira/browse/' ++ test.issue ++ '|' ++ test.issue ++ '>') when (test.issue != null) otherwise 'None'
+%var withinLimit = payload.failures < ${storage.limit}
+%var resultsPresent = payload.failures > 0 and withinLimit
+%var prevButton = 
+	{
+        "name": "prev",
+        "text": "Back",
+        "type": "button",
+        "value": "previous"
+	} when bottomRange > 0 otherwise {}
+%var nextButton = 
+	{
+        "name": "next",
+        "text": "Next",
+        "type": "button",
+        "value": "next"
+	} when payload.failures > flowVars.range and withinLimit otherwise {}
+%var navigation = 
+	{
+		fallback: 'See others...',
+		title: "Navigate...",
+		callback_id: flowVars.range as :string,
+		actions : [] ++ [prevButton] ++ [nextButton]
+		
+	} when (payload.failures > flowVars.range and withinLimit) or (bottomRange > 0) otherwise {}
+%var textMessage = 
+	('There are ' ++ payload.failures as :string ++ ' failures on branch `' ++ flowVars.branch as :string ++ '`. Showing tests ' ++ (bottomRange + 1) as :string ++ ' through ' ++ upRange as :string ++ '.')
+	when resultsPresent
+	otherwise 
+		(':tada: There are no failures on branch `' ++ flowVars.branch as :string ++ '` :tada:' 
+			when withinLimit
+			otherwise 'There are ' ++ payload.failures ++ ' failures on branch `' ++ flowVars.branch as :string ++ '` :scream:. See latest build <' ++ jobUrl ++ '|results> for details.'
+		) 
+ - - -
+{
+	response_type: 'in_channel',
+	text: textMessage,
+	attachments: 
+		(payload.tests[bottomRange to (upRange - 1)] map ((test , indexOfTest) -> {
+		fallback: toFullName(test),
+		title: toFullName(test) ++ ' (' ++ test.age ++ ')',
+		title_link: toUrl(test),
+		color: 'warning',
+		callback_id: toFullName(test),
+		fields: 
+		[
+			{
+				title: 'Assignee',
+				value: test.assignee,
+				short: true
+			},
+			{
+				title: 'Issue',
+				value: toJiraUrl(test),
+				short: true
+			}
+		] when test.assignee != null otherwise [],
+		actions : 
+		[
+	        {
+	            "name": "assignTo",
+	            "text": "Assign to...",
+	            "type": "select",
+	            "options": 
+	            [
+	                {
+	                    "text": "Anita",
+	                    "value": "afelisatti"
+	                },
+	                {
+	                    "text": "Ale I.",
+	                    "value": "alejandro.iannucci"
+	                },
+	                {
+	                    "text": "Ale M.",
+	                    "value": "alejandro.garcia"
+	                },
+	                {
+	                    "text": "Ale N.",
+	                    "value": "alejandro.nosenzo"
+	                },
+	                {
+	                    "text": "Baca",
+	                    "value": "juan.baca"
+	                },
+	                {
+	                    "text": "Balbi",
+	                    "value": "pablo.balbi"
+	                },
+	                {
+	                    "text": "Eugenia",
+	                    "value": "eugenia.mariotti"
+	                },
+	                {
+	                    "text": "Fabian",
+	                    "value": "fabian.gonzalez"
+	                },
+	                {
+	                    "text": "Guille",
+	                    "value": "guillermo.fernandes"
+	                },
+	                {
+	                    "text": "Juani",
+	                    "value": "juan.desimoni"
+	                },
+	                {
+	                    "text": "Lucho",
+	                    "value": "luciano.raineri"
+	                },
+	                {
+	                    "text": "MG",
+	                    "value": "mariano.gonzalez"
+	                },
+	                {
+	                    "text": "Martin",
+	                    "value": "martin.buchwald"
+	                },
+	                {
+	                    "text": "Nico",
+	                    "value": "ndinucci"
+	                },
+	                {
+	                    "text": "PLG",
+	                    "value": "pablo.lagreca"
+	                },
+	                {
+	                    "text": "Rodro",
+	                    "value": "rodrigo.merino"
+	                },
+	                {
+	                    "text": "Steve",
+	                    "value": "esteban.wasinger"
+	                }
+                   ] 
+                },
+    			{
+                    "name": "assignSelf",
+                    "text": "Assign to me :raised_hand:",
+                    "type": "button",
+                    "value": "self"
+            	}
+         ] when test.assignee == null otherwise []
+	}) when resultsPresent otherwise []) ++ [navigation]
+}-->
+                    <![CDATA[%dw 1.0
+%output application/json
+%var upRange = min [flowVars.range, payload.failures]
+%var bottomRange = flowVars.range - 10
+%var toFullClassName = (test) -> test.package ++ '.' ++ test.class
+%var toFullName = (test) -> (test.class ++ '.' ++ test.name) when toFullClassName(test) != test.name otherwise test.class
+%var nameUrl = (test) -> test.name when toFullClassName(test) != test.name otherwise (test.name replace "." with "_")
+%var jobUrl = 'https://${jenkins.host}${jenkins.path}job/' ++ flowVars.branch ++ '/lastSuccessfulBuild/testReport' 
+%var toUrl = (test) -> jobUrl ++ '/junit/' ++ test.package ++ '/' ++ test.class ++ '/' ++ nameUrl(test) ++ '/'
+%var toJiraUrl = (test) -> ('<https://www.mulesoft.org/jira/browse/' ++ test.issue ++ '|' ++ test.issue ++ '>') when (test.issue != null) otherwise 'None'
+%var withinLimit = payload.failures < ${storage.limit}
+%var resultsPresent = payload.failures > 0 and withinLimit
+%var prevButton = 
+	{
+        "name": "prev",
+        "text": "Back",
+        "type": "button",
+        "value": "previous"
+	} when bottomRange > 0 otherwise {}
+%var nextButton = 
+	{
+        "name": "next",
+        "text": "Next",
+        "type": "button",
+        "value": "next"
+	} when payload.failures > flowVars.range and withinLimit otherwise {}
+%var navigation = 
+	{
+		fallback: 'See others...',
+		title: "Navigate...",
+		callback_id: flowVars.range as :string,
+		actions : [] ++ [prevButton] ++ [nextButton]
+		
+	} when (payload.failures > flowVars.range and withinLimit) or (bottomRange > 0) otherwise {}
+%var textMessage = 
+	('There are ' ++ payload.failures as :string ++ ' failures on branch `' ++ flowVars.branch as :string ++ '`. Showing tests ' ++ (bottomRange + 1) as :string ++ ' through ' ++ upRange as :string ++ '.')
+	when resultsPresent
+	otherwise 
+		(':tada: There are no failures on branch `' ++ flowVars.branch as :string ++ '` :tada:' 
+			when withinLimit
+			otherwise 'There are ' ++ payload.failures ++ ' failures on branch `' ++ flowVars.branch as :string ++ '` :scream:. See latest build <' ++ jobUrl ++ '|results> for details.'
+		) 
+---
+{
+	response_type: 'in_channel',
+	text: textMessage,
+	attachments: 
+		(payload.tests[bottomRange to (upRange - 1)] map ((test , indexOfTest) -> {
+		fallback: toFullName(test),
+		title: toFullName(test) ++ ' (' ++ test.age ++ ')',
+		title_link: toUrl(test),
+		color: 'warning',
+		callback_id: toFullName(test),
+		fields: 
+		[
+			{
+				title: 'Assignee',
+				value: test.assignee,
+				short: true
+			},
+			{
+				title: 'Issue',
+				value: toJiraUrl(test),
+				short: true
+			}
+		] when test.assignee != null otherwise [],
+		actions : 
+		[
+	        {
+	            "name": "assignTo",
+	            "text": "Assign to...",
+	            "type": "select",
+	            "options": 
+	            [
+	                {
+	                    "text": "Anita",
+	                    "value": "afelisatti"
+	                },
+	                {
+	                    "text": "Ale I.",
+	                    "value": "alejandro.iannucci"
+	                },
+	                {
+	                    "text": "Ale M.",
+	                    "value": "alejandro.garcia"
+	                },
+	                {
+	                    "text": "Ale N.",
+	                    "value": "alejandro.nosenzo"
+	                },
+	                {
+	                    "text": "Baca",
+	                    "value": "juan.baca"
+	                },
+	                {
+	                    "text": "Balbi",
+	                    "value": "pablo.balbi"
+	                },
+	                {
+	                    "text": "Eugenia",
+	                    "value": "eugenia.mariotti"
+	                },
+	                {
+	                    "text": "Fabian",
+	                    "value": "fabian.gonzalez"
+	                },
+	                {
+	                    "text": "Guille",
+	                    "value": "guillermo.fernandes"
+	                },
+	                {
+	                    "text": "Juani",
+	                    "value": "juan.desimoni"
+	                },
+	                {
+	                    "text": "Lucho",
+	                    "value": "luciano.raineri"
+	                },
+	                {
+	                    "text": "MG",
+	                    "value": "mariano.gonzalez"
+	                },
+	                {
+	                    "text": "Martin",
+	                    "value": "martin.buchwald"
+	                },
+	                {
+	                    "text": "Nico",
+	                    "value": "ndinucci"
+	                },
+	                {
+	                    "text": "PLG",
+	                    "value": "pablo.lagreca"
+	                },
+	                {
+	                    "text": "Rodro",
+	                    "value": "rodrigo.merino"
+	                },
+	                {
+	                    "text": "Steve",
+	                    "value": "esteban.wasinger"
+	                }
+                   ] 
+                },
+    			{
+                    "name": "assignSelf",
+                    "text": "Assign to me :raised_hand:",
+                    "type": "button",
+                    "value": "self"
+            	}
+         ] when test.assignee == null otherwise []
+	}) when resultsPresent otherwise []) ++ [navigation]
+}]]>
+                </ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <error-handler>
+            <on-error-propagate doc:name="Rollback Exception Strategy">
+                <logger message="#[&quot;Error retrieving $(vars.branch) status.&quot;]" level="INFO" doc:name="error" />
+                <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Error retrieving $(vars.branch) status.'}&quot;]" doc:name="status error" mimeType="application/json" />
+            </on-error-propagate>
+        </error-handler>
+
+    </flow>
+
+    <flow name="interactiveInbound">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/interactive" doc:name="HTTP">
+            <http:response statusCode="#[migration::HttpListener::httpListenerResponseSuccessStatusCode(vars)]">
+                <!--Migration WARN: Avoid using an outbound property to determine the status code.-->
+                <!--    For more information refer to:-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                <http:headers>#[migration::HttpListener::httpListenerResponseHeaders(vars)]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.statusCode default migration::HttpListener::httpListenerResponseErrorStatusCode(vars)]">
+                <!--Migration WARN: Avoid using an outbound property to determine the status code.-->
+                <!--    For more information refer to:-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                <http:headers>#[migration::HttpListener::httpListenerResponseHeaders(vars)]</http:headers>
+            </http:error-response>
+        </http:listener>
+
+        <compatibility:attributes-to-inbound-properties>
+            <!--Migration WARN: Expressions that query 'inboundProperties' from the message should instead query the message 'attributes'. Remove this component if there are no uses of 'inboundProperties' in expressions or components that rely on 'inboundProperties' (such as 'copy-properties').-->
+            <!--    For more information refer to:-->
+            <!--        * https://docs.mulesoft.com/mule-runtime/4.3/intro-mule-message#inbound-properties-are-now-attributes-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#inbound_properties-->
+        </compatibility:attributes-to-inbound-properties>
+
+        <set-payload value="#[payload.payload]" mimeType="application/json" doc:name="payload" />
+
+        <ee:transform doc:name="find action - branch">
+            <ee:variables>
+                <ee:set-variable variableName="action">%dw 2.0
+output application/java  
+---
+payload.actions[0].name</ee:set-variable>
+                <ee:set-variable variableName="branch"><![CDATA[%dw 2.0
+output application/java  
+---
+(payload."original_message".text splitBy "`")[1]]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+        <logger message="#[&quot;Incoming Slack action '$(vars.action)' for branch '$(vars.branch)'&quot;]" level="INFO" doc:name="action" />
+
+        <choice doc:name="Choice">
+            <when expression="#[mel:&quot;next&quot;.equals(action)]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <ee:transform doc:name="next range">
+                    <ee:variables>
+                        <ee:set-variable variableName="range"><![CDATA[%dw 2.0
+output application/java  
+---
+payload."original_message".attachments[-1]."callback_id" as Number + 10]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </when>
+            <when expression="#[mel:&quot;prev&quot;.equals(action)]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <ee:transform doc:name="previous range">
+                    <ee:variables>
+                        <ee:set-variable variableName="range"><![CDATA[%dw 2.0
+output application/java  
+---
+payload."original_message".attachments[-1]."callback_id" as Number - 10]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+            </when>
+            <otherwise>
+                <set-payload value="#[payload]" mimeType="null" />
+                <ee:transform doc:name="find test - assignee - range">
+                    <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+                    <ee:variables>
+                        <ee:set-variable variableName="test"><![CDATA[%dw 2.0
+output application/java  
+---
+payload."callback_id"]]></ee:set-variable>
+                        <ee:set-variable variableName="assignee"><![CDATA[%dw 2.0
+output application/java  
+---
+if (payload.actions[0].name == "assignSelf")
+  payload.user.name
+else
+  payload.actions[0]."selected_options"[0].value]]></ee:set-variable>
+                        <ee:set-variable variableName="range"><![CDATA[%dw 2.0
+output application/java  
+---
+if (payload."original_message".attachments[-1].title == "Navigate...")
+  payload."original_message".attachments[-1]."callback_id"
+else
+  10]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <logger message="#[&quot;Assigning $(vars.test) to $(vars.assignee) in $(vars.branch)&quot;]" level="INFO" doc:name="assingning" />
+                <flow-ref name="update" doc:name=" update test data" />
+            </otherwise>
+        </choice>
+
+        <logger message="#[&quot;Success, returning $(vars.branch) status with range: $(vars.range)&quot;]" level="INFO" doc:name="sucess" />
+
+        <flow-ref name="status" doc:name="status" />
+
+        <compatibility:outbound-properties-to-var>
+            <!--Migration WARN: Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as 'method') of the operation or listener that accepts the expression.-->
+            <!--    For more information refer to:-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+        </compatibility:outbound-properties-to-var>
+
+    </flow>
+
+    <flow name="slackInbound">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/slack" allowedMethods="POST" doc:name="HTTP">
+            <http:response statusCode="#[migration::HttpListener::httpListenerResponseSuccessStatusCode(vars)]">
+                <!--Migration WARN: Avoid using an outbound property to determine the status code.-->
+                <!--    For more information refer to:-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                <http:headers>#[migration::HttpListener::httpListenerResponseHeaders(vars)]</http:headers>
+            </http:response>
+            <http:error-response statusCode="#[vars.statusCode default migration::HttpListener::httpListenerResponseErrorStatusCode(vars)]">
+                <!--Migration WARN: Avoid using an outbound property to determine the status code.-->
+                <!--    For more information refer to:-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                <http:headers>#[migration::HttpListener::httpListenerResponseHeaders(vars)]</http:headers>
+            </http:error-response>
+        </http:listener>
+
+        <compatibility:attributes-to-inbound-properties>
+            <!--Migration WARN: Expressions that query 'inboundProperties' from the message should instead query the message 'attributes'. Remove this component if there are no uses of 'inboundProperties' in expressions or components that rely on 'inboundProperties' (such as 'copy-properties').-->
+            <!--    For more information refer to:-->
+            <!--        * https://docs.mulesoft.com/mule-runtime/4.3/intro-mule-message#inbound-properties-are-now-attributes-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#inbound_properties-->
+        </compatibility:attributes-to-inbound-properties>
+
+        <set-payload value="#[payload]" mimeType="application/java" doc:name="application/java" />
+
+        <logger message="#[&quot;Incoming Slack request: $(payload.text)&quot;]" level="INFO" doc:name="request" />
+
+        <ee:transform doc:name="extract words">
+            <ee:variables>
+                <ee:set-variable variableName="words"><![CDATA[%dw 2.0
+output application/java  
+---
+payload.text splitBy " "]]></ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+        <choice doc:name="Choice">
+            <when expression="#[mel:payload.text.startsWith('status')]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <!--Migration WARN: The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/dataweave-cookbook-java-methods-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <ee:transform doc:name="find range - branch">
+                    <ee:variables>
+                        <ee:set-variable variableName="range">%dw 2.0
+output application/java  
+---
+10</ee:set-variable>
+                        <ee:set-variable variableName="branch"><![CDATA[%dw 2.0
+output application/java  
+---
+if (((sizeOf(vars.words)) < 2))
+  "$($){jenkins.build}"
+else
+  vars.words[1]]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <flow-ref name="validateBranch" doc:name="validate branch" />
+                <flow-ref name="status" doc:name="status" />
+            </when>
+            <when expression="#[mel:payload.text.startsWith('assign')]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <!--Migration WARN: The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/dataweave-cookbook-java-methods-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <flow-ref name="assign" doc:name="assign" />
+            </when>
+            <when expression="#[mel:payload.text.startsWith('track')]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <!--Migration WARN: The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/dataweave-cookbook-java-methods-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <flow-ref name="track" doc:name="track" />
+            </when>
+            <when expression="#[mel:payload.text.startsWith('refresh')]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <!--Migration WARN: The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/dataweave-cookbook-java-methods-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <ee:transform doc:name="find branch">
+                    <ee:variables>
+                        <ee:set-variable variableName="branch"><![CDATA[%dw 2.0
+output application/java  
+---
+if (((sizeOf(vars.words)) < 2))
+  "$($){jenkins.build}"
+else
+  vars.words[1]]]></ee:set-variable>
+                    </ee:variables>
+                </ee:transform>
+                <flow-ref name="validateBranch" doc:name="validate branch" />
+                <flow-ref name="refresh" doc:name="refresh" />
+                <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Successfully triggered `$(vars.branch)` refresh. Results should be available shortly.'}&quot;]" doc:name="success" mimeType="application/json" />
+            </when>
+            <when expression="#[mel:payload.text.startsWith('clear')]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <!--Migration WARN: The MEL expression contains a method invocation that could not be migrated to a Dataweave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/dataweave-cookbook-java-methods-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <flow-ref name="clear" doc:name="clear" />
+            </when>
+            <otherwise>
+                <ee:transform doc:name="usage">
+                    <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+                    <ee:message>
+                        <ee:set-payload><![CDATA[%dw 2.0
+output application/json  
+---
+{
+  "response_type": "ephemeral",
+  text: "Use `status {branch}` to see current failures in a branch, `assign {testClass.testName} to {user} in {branch}` to assign a failing test to someone or `track {testClass.testName} with {issue} in {branch}` to associate a test to its JIRA ticket. If no branch is defined, `$($){jenkins.build}` will be used."
+}]]></ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </otherwise>
+        </choice>
+
+        <logger message="Slack command handled successfully." level="INFO" doc:name="success" />
+
+        <compatibility:outbound-properties-to-var>
+            <!--Migration WARN: Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as 'method') of the operation or listener that accepts the expression.-->
+            <!--    For more information refer to:-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+        </compatibility:outbound-properties-to-var>
+
+        <error-handler>
+            <on-error-continue doc:name="Catch Exception Strategy">
+                <set-payload value="#[payload]" doc:name="propagate payload" />
+                <compatibility:outbound-properties-to-var>
+                    <!--Migration WARN: Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as 'method') of the operation or listener that accepts the expression.-->
+                    <!--    For more information refer to:-->
+                    <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                </compatibility:outbound-properties-to-var>
+            </on-error-continue>
+        </error-handler>
+
+    </flow>
+
+    <flow name="refresh">
+        <flow-ref name="currentStatus" doc:name="current status" />
+
+        <async doc:name="Async">
+            <flow-ref name="async-refresh" doc:name="refresh" />
+        </async>
+
+    </flow>
+
+    <flow name="async-refresh">
+        <logger message="Sending request to Jenkins" level="INFO" doc:name="sending" />
+
+        <set-payload value="something" mimeType="application/xml" doc:name="mime type workaround" />
+
+        <compatibility:outbound-properties-to-var>
+            <!--Migration WARN: Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as 'method') of the operation or listener that accepts the expression.-->
+            <!--    For more information refer to:-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+        </compatibility:outbound-properties-to-var>
+
+        <http:request config-ref="HTTP_Request_Configuration" path="#[&quot;job/$(vars.branch)/lastSuccessfulBuild/testReport/api/xml&quot;]" method="GET" doc:name="get jenkins status">
+            <!--Migration WARN: Build the 'query-params' map with a single DataWeave expression.-->
+            <!--    For more information refer to:-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+            <!--<http:query-params xmlns:http="http://www.mulesoft.org/schema/mule/http" />-->
+            <http:headers>#[migration::HttpRequester::httpRequesterHeaders(vars)]</http:headers>
+            <http:query-params><![CDATA[#[{'xpath' : '//case[status[text()='FAILED' or text()='REGRESSION']]'} ++ {'wrapper' : 'tests'}]]]></http:query-params>
+        </http:request>
+
+        <compatibility:attributes-to-inbound-properties>
+            <!--Migration WARN: Expressions that query 'inboundProperties' from the message should instead query the message 'attributes'. Remove this component if there are no uses of 'inboundProperties' in expressions or components that rely on 'inboundProperties' (such as 'copy-properties').-->
+            <!--    For more information refer to:-->
+            <!--        * https://docs.mulesoft.com/mule-runtime/4.3/intro-mule-message#inbound-properties-are-now-attributes-->
+            <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#inbound_properties-->
+        </compatibility:attributes-to-inbound-properties>
+
+        <set-payload value="#[payload]" mimeType="null" />
+
+        <set-variable variableName="previousStatus" value="#[vars.previousStatus]" mimeType="null" />
+
+        <ee:transform doc:name="analize results">
+            <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+            <ee:message>
+                <ee:set-payload>
+                    <!--Migration ERROR: Error migrating DataWeave script from DW 1.0 to DW 2.0: %dw 1.0
+%output application/json
+%var toParts = (case) -> case.className splitBy "."
+%var toClass = (case) -> toParts(case)[(sizeOf toParts(case)) - 1]
+%var toPackage = (case) -> (toParts(case) - toClass(case)) reduce ($$ ++ '.' ++ $)
+%var previousAssignee = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).assignee[0] default null
+%var previousIssue = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).issue[0] default null
+%var failuresCount = sizeOf payload.tests when payload.tests != "" otherwise 0
+ - - -
+{
+	failures: failuresCount,
+	tests: (payload.tests.*case map ((case , indexOfCase) -> {
+		package : toPackage(case),
+		class: toClass(case),
+		name: case.name,
+		age: case.age,
+		assignee: previousAssignee(case),
+		issue: previousIssue(case)
+	})) when failuresCount > 0 and failuresCount < ${storage.limit} otherwise []
+}-->
+                    <![CDATA[%dw 1.0
+%output application/json
+%var toParts = (case) -> case.className splitBy "."
+%var toClass = (case) -> toParts(case)[(sizeOf toParts(case)) - 1]
+%var toPackage = (case) -> (toParts(case) - toClass(case)) reduce ($$ ++ '.' ++ $)
+%var previousAssignee = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).assignee[0] default null
+%var previousIssue = (case) -> (flowVars.previousStatus.tests filter (($.class == toClass(case)) and ($.name == case.name))).issue[0] default null
+%var failuresCount = sizeOf payload.tests when payload.tests != "" otherwise 0
+---
+{
+	failures: failuresCount,
+	tests: (payload.tests.*case map ((case , indexOfCase) -> {
+		package : toPackage(case),
+		class: toClass(case),
+		name: case.name,
+		age: case.age,
+		assignee: previousAssignee(case),
+		issue: previousIssue(case)
+	})) when failuresCount > 0 and failuresCount < ${storage.limit} otherwise []
+}]]>
+                </ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+        <logger message="Success, updating stored data." level="INFO" doc:name="updating" />
+
+        <object-to-byte-array-transformer doc:name="Object to Byte Array" />
+
+        <os:store objectStore="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="new status">
+            <os:value><![CDATA[#[payload]]]></os:value>
+        </os:store>
+
+        <logger message="#[&quot;Successfully refreshed $(vars.branch) status.&quot;]" level="INFO" doc:name="success" />
+
+        <error-handler>
+            <on-error-propagate doc:name="Rollback Exception Strategy">
+                <logger message="#[&quot;Error refreshing branch $(vars.branch).&quot;]" level="INFO" doc:name="error" />
+            </on-error-propagate>
+        </error-handler>
+
+    </flow>
+
+    <flow name="currentStatus">
+        <os:contains objectStore="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="check status" />
+
+        <choice doc:name="Choice">
+            <when expression="#[payload]">
+                <logger message="#[&quot;Retrieving stored status for branch $(vars.branch)&quot;]" level="INFO" doc:name="retrieving" />
+                <os:retrieve objectStore="ObjectStore__Connector" key="#[flowVars.branch]" doc:name="previous status" />
+                <byte-array-to-object-transformer mimeType="application/json" doc:name="Byte Array to Object" />
+            </when>
+            <otherwise>
+                <logger message="Generating default status." level="INFO" doc:name="default" />
+                <ee:transform doc:name="default empty status">
+                    <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+                    <ee:message>
+                        <ee:set-payload>%dw 2.0
+output application/json  
+---
+{
+  failures: 0,
+  tests: []
+}</ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+            </otherwise>
+        </choice>
+
+        <ee:transform doc:name="previous status">
+            <ee:variables>
+                <ee:set-variable variableName="previousStatus">%dw 2.0
+output application/java  
+---
+payload</ee:set-variable>
+            </ee:variables>
+        </ee:transform>
+
+    </flow>
+
+    <flow name="validateBranch">
+        <choice doc:name="Choice">
+            <when expression="#[mel:'${jenkins.build}'.equals(flowVars.branch)]">
+                <!--Migration WARN: The MEL expression could not be migrated to a DataWeave expression.-->
+                <!--    For more information refer to:-->
+                <!--        * https://docs.mulesoft.com/mule-runtime/4.3/migration-mel-->
+                <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#mel_expressions-->
+                <!--        * https://blogs.mulesoft.com/dev/mule-dev/why-dataweave-main-expression-language-mule-4-->
+                <logger message="Default branch selected, no validation required." level="INFO" doc:name="default branch" />
+            </when>
+            <otherwise>
+                <set-variable variableName="previousPayload" value="#[payload]" doc:name="store payload" />
+                <set-payload value="something" mimeType="application/xml" doc:name="mime type workaround" />
+                <compatibility:outbound-properties-to-var>
+                    <!--Migration WARN: Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as 'method') of the operation or listener that accepts the expression.-->
+                    <!--    For more information refer to:-->
+                    <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                </compatibility:outbound-properties-to-var>
+                <http:request config-ref="HTTP_Request_Configuration" path="api/xml" method="GET" doc:name="get jenkins jobs">
+                    <!--Migration WARN: Build the 'query-params' map with a single DataWeave expression.-->
+                    <!--    For more information refer to:-->
+                    <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#outbound_properties-->
+                    <!--<http:query-params xmlns:http="http://www.mulesoft.org/schema/mule/http" />-->
+                    <http:headers>#[migration::HttpRequester::httpRequesterHeaders(vars)]</http:headers>
+                    <http:query-params><![CDATA[#[{'xpath' : '//job'} ++ {'wrapper' : 'jobs'}]]]></http:query-params>
+                </http:request>
+                <compatibility:attributes-to-inbound-properties>
+                    <!--Migration WARN: Expressions that query 'inboundProperties' from the message should instead query the message 'attributes'. Remove this component if there are no uses of 'inboundProperties' in expressions or components that rely on 'inboundProperties' (such as 'copy-properties').-->
+                    <!--    For more information refer to:-->
+                    <!--        * https://docs.mulesoft.com/mule-runtime/4.3/intro-mule-message#inbound-properties-are-now-attributes-->
+                    <!--        * https://github.com/mulesoft/mule-migration-assistant/blob/master/docs/user-docs/migration-tool-post-mig.adoc#inbound_properties-->
+                </compatibility:attributes-to-inbound-properties>
+                <set-payload value="#[payload]" mimeType="application/xml" />
+                <ee:transform doc:name="look for matches">
+                    <!--Migration ERROR: Custom types defined in Studio 6 are not migrated to Studio 7.-->
+                    <ee:message>
+                        <ee:set-payload>%dw 2.0
+output application/java  
+---
+payload.jobs filter ($.name == vars.branch)</ee:set-payload>
+                    </ee:message>
+                </ee:transform>
+                <validation:is-not-empty-collection value="#[payload]" doc:name="not empty" />
+                <set-payload value="#[vars.previousPayload]" doc:name="reinstate payload" />
+            </otherwise>
+        </choice>
+
+        <error-handler>
+            <on-error-propagate doc:name="Rollback Exception Strategy">
+                <logger message="#[&quot;Could not validate branch $(vars.branch)&quot;]" level="INFO" doc:name="error" />
+                <set-payload value="#[&quot;{'response_type': 'ephemeral','text': 'Could not validate the existence of a `$(vars.branch)` branch.'}&quot;]" mimeType="application/json" doc:name="validation failure" />
+            </on-error-propagate>
+        </error-handler>
+
+    </flow>
+
+    <flow name="clear">
+        <logger message="Clearing all statuses." level="INFO" doc:name="Logger" />
+
+        <os:retrieve-all-keys objectStore="ObjectStore__Connector" doc:name="get branches" />
+
+        <foreach doc:name="For Each">
+            <os:remove objectStore="ObjectStore__Connector" key="#[payload]" doc:name="remove branch" />
+        </foreach>
+
+        <ee:transform doc:name="success">
+            <ee:message>
+                <ee:set-payload><![CDATA[%dw 2.0
+output application/json  
+---
+{
+  "response_type": "ephemeral",
+  text: "Deleted statuses for branches: `" ++ (payload joinBy " - ") ++ "`. Trigger a refresh to load them again."
+}]]></ee:set-payload>
+            </ee:message>
+        </ee:transform>
+
+    </flow>
+
+</mule>

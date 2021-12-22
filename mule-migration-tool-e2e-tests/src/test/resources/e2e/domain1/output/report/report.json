@@ -1,15 +1,13 @@
 {
   "projectType": "MULE_THREE_DOMAIN",
   "projectName": "input",
-  "connectorsUsed": [],
-  "numberOfMuleComponents": 3,
-  "numberOfMuleComponentsMigrated": 3,
+  "connectorsUsed": [
+    "org.mule.connectors:mule-http-connector:1.5.25"
+  ],
+  "numberOfMuleComponents": 2,
+  "numberOfMuleComponentsMigrated": 2,
   "componentDetails": {
     "domain:mule-domain": [
-      1,
-      0
-    ],
-    "http:worker-threading-profile": [
       1,
       0
     ],
@@ -18,10 +16,14 @@
       0
     ]
   },
-  "numberOfMELExpLines": 0,
-  "numberOfMELExpLinesMigrated": 0,
+  "numberOfMELExpressions": 0,
+  "numberOfMELExpressionsMigrated": 0,
+  "numberOfMELExpressionLines": 0,
+  "numberOfMELExpressionLinesMigrated": 0,
   "numberOfDWTransformations": 0,
   "numberOfDWTransformationsMigrated": 0,
+  "numberOfDWTransformationLines": 0,
+  "numberOfDWTransformationLinesMigrated": 0,
   "detailedMessages": [
     {
       "level": "WARN",

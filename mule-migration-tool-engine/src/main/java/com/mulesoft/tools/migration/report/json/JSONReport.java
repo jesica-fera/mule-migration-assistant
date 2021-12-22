@@ -71,10 +71,14 @@ public class JSONReport {
     private final Integer numberOfMuleComponents;
     private final Integer numberOfMuleComponentsMigrated;
     private final Map<String, int[]> componentDetails;
-    private final Integer numberOfMELExpLines;
-    private final Integer numberOfMELExpLinesMigrated;
+    private final Integer numberOfMELExpressions;
+    private final Integer numberOfMELExpressionsMigrated;
+    private final Integer numberOfMELExpressionLines;
+    private final Integer numberOfMELExpressionLinesMigrated;
     private final Integer numberOfDWTransformations;
     private final Integer numberOfDWTransformationsMigrated;
+    private final Integer numberOfDWTransformationLines;
+    private final Integer numberOfDWTransformationLinesMigrated;
     private final List<JSONReportEntryModel> detailedMessages;
 
     public JSONReportModel(MigrationReport<ReportEntryModel> report, Path outputProject) {
@@ -84,10 +88,14 @@ public class JSONReport {
       numberOfMuleComponentsMigrated = report.getComponentSuccessCount();
       numberOfMuleComponents = report.getComponentFailureCount() + numberOfMuleComponentsMigrated;
       componentDetails = report.getComponents();
-      numberOfMELExpLinesMigrated = report.getMelExpressionsSuccessLineCount();
-      numberOfMELExpLines = report.getMelExpressionsFailureLineCount() + numberOfMELExpLinesMigrated;
+      numberOfMELExpressionsMigrated = report.getMelExpressionsSuccessCount();
+      numberOfMELExpressions = report.getMelExpressionsFailureCount() + numberOfMELExpressionsMigrated;
+      numberOfMELExpressionLinesMigrated = report.getMelExpressionsSuccessLineCount();
+      numberOfMELExpressionLines = report.getMelExpressionsFailureLineCount() + numberOfMELExpressionLinesMigrated;
       numberOfDWTransformationsMigrated = report.getDwTransformsSuccessCount();
       numberOfDWTransformations = report.getDwTransformsFailureCount() + numberOfDWTransformationsMigrated;
+      numberOfDWTransformationLinesMigrated = report.getDwTransformsSuccessLineCount();
+      numberOfDWTransformationLines = report.getDwTransformsFailureLineCount() + numberOfDWTransformationLinesMigrated;
       detailedMessages = report.getReportEntries().stream()
           .map((re) -> JSONReportEntryModel.fromReportModel(re, outputProject))
           .sorted(Comparator.comparing(JSONReportEntryModel::getMessage))
@@ -120,12 +128,20 @@ public class JSONReport {
       return componentDetails;
     }
 
-    public Integer getNumberOfMELExpLines() {
-      return numberOfMELExpLines;
+    public Integer getNumberOfMELExpressions() {
+      return numberOfMELExpressions;
     }
 
-    public Integer getNumberOfMELExpLinesMigrated() {
-      return numberOfMELExpLinesMigrated;
+    public Integer getNumberOfMELExpressionsMigrated() {
+      return numberOfMELExpressionsMigrated;
+    }
+
+    public Integer getNumberOfMELExpressionLines() {
+      return numberOfMELExpressionLines;
+    }
+
+    public Integer getNumberOfMELExpressionLinesMigrated() {
+      return numberOfMELExpressionLinesMigrated;
     }
 
     public Integer getNumberOfDWTransformations() {
@@ -134,6 +150,14 @@ public class JSONReport {
 
     public Integer getNumberOfDWTransformationsMigrated() {
       return numberOfDWTransformationsMigrated;
+    }
+
+    public Integer getNumberOfDWTransformationLines() {
+      return numberOfDWTransformationLines;
+    }
+
+    public Integer getNumberOfDWTransformationLinesMigrated() {
+      return numberOfDWTransformationLinesMigrated;
     }
 
     public List<JSONReportEntryModel> getDetailedMessages() {

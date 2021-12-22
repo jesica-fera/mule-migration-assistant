@@ -78,7 +78,7 @@ public class HttpConnectorRequestConfig extends AbstractHttpConnectorMigrationSt
 
     object.getChildren().forEach(c -> {
       if (HTTP_NAMESPACE_URI.equals(c.getNamespaceURI())) {
-        execute(c, report);
+        executeMigration(c, report);
       } else if (TLS_NAMESPACE_URI.equals(c.getNamespaceURI()) && "context".equals(c.getName())) {
         final Element requestConnection = c.getParentElement().getChild("request-connection", HTTP_NAMESPACE);
         c.detach();
