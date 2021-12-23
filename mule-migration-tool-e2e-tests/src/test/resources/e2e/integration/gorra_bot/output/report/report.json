@@ -1,109 +1,109 @@
 {
   "projectType": "MULE_THREE_MAVEN_APPLICATION",
   "projectName": "input",
-  "connectorsUsed": [
+  "connectorsMigrated": [
     "org.mule.connectors:mule-http-connector:1.5.25",
     "org.mule.connectors:mule-objectstore-connector:1.2.1"
   ],
   "numberOfMuleComponents": 110,
   "numberOfMuleComponentsMigrated": 110,
   "componentDetails": {
-    ":mule": [
-      1,
-      0
-    ],
-    ":logger": [
-      19,
-      0
-    ],
-    ":catch-exception-strategy": [
-      1,
-      0
-    ],
-    ":rollback-exception-strategy": [
-      5,
-      0
-    ],
-    ":foreach": [
-      2,
-      0
-    ],
-    ":flow": [
-      11,
-      0
-    ],
-    ":flow-ref": [
-      17,
-      0
-    ],
-    ":async": [
-      1,
-      0
-    ],
-    ":choice": [
-      4,
-      0
-    ],
-    ":set-payload": [
-      13,
-      0
-    ],
-    ":set-variable": [
-      1,
-      0
-    ],
-    "dw:transform-message": [
-      17,
-      0
-    ],
-    "validation:is-not-empty": [
-      1,
-      0
-    ],
-    "http:listener-config": [
-      1,
-      0
-    ],
-    "http:request-config": [
-      1,
-      0
-    ],
-    "http:listener": [
-      2,
-      0
-    ],
-    "http:request": [
-      2,
-      0
-    ],
-    "http:query-param": [
-      4,
-      0
-    ],
-    "objectstore:config": [
-      1,
-      0
-    ],
-    "objectstore:contains": [
-      1,
-      0
-    ],
-    "objectstore:retrieve-all-keys": [
-      1,
-      0
-    ],
-    "objectstore:remove": [
-      1,
-      0
-    ],
-    "objectstore:store": [
-      2,
-      0
-    ],
-    "objectstore:retrieve": [
-      1,
-      0
-    ]
+    ":mule": {
+      "success": 1,
+      "failure": 0
+    },
+    ":logger": {
+      "success": 19,
+      "failure": 0
+    },
+    ":catch-exception-strategy": {
+      "success": 1,
+      "failure": 0
+    },
+    ":rollback-exception-strategy": {
+      "success": 5,
+      "failure": 0
+    },
+    ":foreach": {
+      "success": 2,
+      "failure": 0
+    },
+    ":flow": {
+      "success": 11,
+      "failure": 0
+    },
+    ":flow-ref": {
+      "success": 17,
+      "failure": 0
+    },
+    ":async": {
+      "success": 1,
+      "failure": 0
+    },
+    ":choice": {
+      "success": 4,
+      "failure": 0
+    },
+    ":set-payload": {
+      "success": 13,
+      "failure": 0
+    },
+    ":set-variable": {
+      "success": 1,
+      "failure": 0
+    },
+    "dw:transform-message": {
+      "success": 17,
+      "failure": 0
+    },
+    "validation:is-not-empty": {
+      "success": 1,
+      "failure": 0
+    },
+    "http:listener-config": {
+      "success": 1,
+      "failure": 0
+    },
+    "http:request-config": {
+      "success": 1,
+      "failure": 0
+    },
+    "http:listener": {
+      "success": 2,
+      "failure": 0
+    },
+    "http:request": {
+      "success": 2,
+      "failure": 0
+    },
+    "http:query-param": {
+      "success": 4,
+      "failure": 0
+    },
+    "objectstore:config": {
+      "success": 1,
+      "failure": 0
+    },
+    "objectstore:contains": {
+      "success": 1,
+      "failure": 0
+    },
+    "objectstore:retrieve-all-keys": {
+      "success": 1,
+      "failure": 0
+    },
+    "objectstore:remove": {
+      "success": 1,
+      "failure": 0
+    },
+    "objectstore:store": {
+      "success": 2,
+      "failure": 0
+    },
+    "objectstore:retrieve": {
+      "success": 1,
+      "failure": 0
+    }
   },
   "numberOfMELExpressions": 54,
   "numberOfMELExpressionsMigrated": 46,

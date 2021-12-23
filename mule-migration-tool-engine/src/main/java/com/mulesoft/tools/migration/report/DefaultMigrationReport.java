@@ -13,6 +13,7 @@ import com.mulesoft.tools.migration.exception.MigrationAbortException;
 import com.mulesoft.tools.migration.project.ProjectType;
 import com.mulesoft.tools.migration.project.model.pom.PomModel;
 import com.mulesoft.tools.migration.report.html.model.ReportEntryModel;
+import com.mulesoft.tools.migration.step.category.ComponentMigrationStatus;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
 import com.mulesoft.tools.migration.step.util.XmlDslUtils;
 
@@ -63,9 +64,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   private double errorMigrationRatio;
   private int processedElements;
 
-  private final int SUCCESS_IDX = 0;
-  private final int FAILURE_IDX = 1;
-  private final Map<String, int[]> components = new LinkedHashMap<>();
+  private final Map<String, ComponentMigrationStatus> components = new LinkedHashMap<>();
   private final Set<String> connectors = new LinkedHashSet<>();
   private int dwTransformsSuccess;
   private int dwTransformsFailure;
@@ -226,16 +225,16 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   @Override
   public Integer getComponentSuccessCount() {
-    return components.values().stream().map(v -> v[SUCCESS_IDX]).reduce(0, Integer::sum);
+    return components.values().stream().map(ComponentMigrationStatus::getSuccess).reduce(0, Integer::sum);
   }
 
   @Override
   public Integer getComponentFailureCount() {
-    return components.values().stream().map(v -> v[FAILURE_IDX]).reduce(0, Integer::sum);
+    return components.values().stream().map(ComponentMigrationStatus::getFailure).reduce(0, Integer::sum);
   }
 
   @Override
-  public Map<String, int[]> getComponents() {
+  public Map<String, ComponentMigrationStatus> getComponents() {
     return components;
   }
 
@@ -244,22 +243,19 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
   }
 
   @Override
-  public void addComponent(Element element, boolean success) {
-    String name = getComponentKey(element);
-    components.putIfAbsent(name, new int[] {0, 0});
-    components.get(name)[success ? SUCCESS_IDX : FAILURE_IDX] += 1;
-  }
-
-  @Override
   public void addComponentSuccess(Element element) {
     logger.debug(">>>>> addComponentSuccess {}", element.getName());
-    addComponent(element, true);
+    String name = getComponentKey(element);
+    components.putIfAbsent(name, new ComponentMigrationStatus());
+    components.get(name).success();
   }
 
   @Override
   public void addComponentFailure(Element element) {
     logger.debug("XXXXX addComponentFailure {}", element.getName());
-    addComponent(element, false);
+    String name = getComponentKey(element);
+    components.putIfAbsent(name, new ComponentMigrationStatus());
+    components.get(name).failure();
   }
 
   @Override

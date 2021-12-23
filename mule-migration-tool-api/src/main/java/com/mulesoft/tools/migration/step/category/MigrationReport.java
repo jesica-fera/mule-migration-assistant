@@ -103,9 +103,7 @@ public interface MigrationReport<T> {
 
   Integer getComponentFailureCount();
 
-  Map<String, int[]> getComponents();
-
-  void addComponent(Element element, boolean success);
+  Map<String, ComponentMigrationStatus> getComponents();
 
   void addComponentSuccess(Element element);
 

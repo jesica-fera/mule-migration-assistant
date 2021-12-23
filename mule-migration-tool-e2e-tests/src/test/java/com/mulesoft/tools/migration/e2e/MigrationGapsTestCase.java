@@ -5,26 +5,26 @@
  */
 package com.mulesoft.tools.migration.e2e;
 
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
+
 @RunWith(Parameterized.class)
-public class UntilSuccessfulMigrationTestCase extends AbstractEndToEndTestCase {
+public class MigrationGapsTestCase extends AbstractEndToEndTestCase {
 
   @Parameters(name = "{0}")
   public static Object[] params() {
     return new Object[] {
-        "until_successful/until_successful_01",
-        "until_successful/until_successful_02"
+        "gaps/unknown_element",
+        "gaps/unknown_namespace"
     };
   }
 
   private final String appToMigrate;
 
-  public UntilSuccessfulMigrationTestCase(String appToMigrate) {
+  public MigrationGapsTestCase(String appToMigrate) {
     this.appToMigrate = appToMigrate;
   }
 

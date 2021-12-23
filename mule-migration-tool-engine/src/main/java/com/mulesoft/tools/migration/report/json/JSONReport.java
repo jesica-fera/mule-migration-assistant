@@ -8,6 +8,7 @@ package com.mulesoft.tools.migration.report.json;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.mulesoft.tools.migration.report.html.model.ReportEntryModel;
+import com.mulesoft.tools.migration.step.category.ComponentMigrationStatus;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
 
 import java.io.File;
@@ -67,10 +68,10 @@ public class JSONReport {
 
     private final String projectType;
     private final String projectName;
-    private final List<String> connectorsUsed;
+    private final List<String> connectorsMigrated;
     private final Integer numberOfMuleComponents;
     private final Integer numberOfMuleComponentsMigrated;
-    private final Map<String, int[]> componentDetails;
+    private final Map<String, ComponentMigrationStatus> componentDetails;
     private final Integer numberOfMELExpressions;
     private final Integer numberOfMELExpressionsMigrated;
     private final Integer numberOfMELExpressionLines;
@@ -84,7 +85,7 @@ public class JSONReport {
     public JSONReportModel(MigrationReport<ReportEntryModel> report, Path outputProject) {
       projectType = report.getProjectType();
       projectName = report.getProjectName();
-      connectorsUsed = report.getConnectorNames();
+      connectorsMigrated = report.getConnectorNames();
       numberOfMuleComponentsMigrated = report.getComponentSuccessCount();
       numberOfMuleComponents = report.getComponentFailureCount() + numberOfMuleComponentsMigrated;
       componentDetails = report.getComponents();
@@ -112,8 +113,8 @@ public class JSONReport {
       return projectName;
     }
 
-    public List<String> getConnectorsUsed() {
-      return connectorsUsed;
+    public List<String> getConnectorsMigrated() {
+      return connectorsMigrated;
     }
 
     public Integer getNumberOfMuleComponents() {
@@ -124,7 +125,7 @@ public class JSONReport {
       return numberOfMuleComponentsMigrated;
     }
 
-    public Map<String, int[]> getComponentDetails() {
+    public Map<String, ComponentMigrationStatus> getComponentDetails() {
       return componentDetails;
     }
 

@@ -1,36 +1,36 @@
 {
   "projectType": "MULE_THREE_APPLICATION",
   "projectName": "input",
-  "connectorsUsed": [
+  "connectorsMigrated": [
     "org.mule.connectors:mule-wsc-connector:1.6.4"
   ],
   "numberOfMuleComponents": 6,
   "numberOfMuleComponentsMigrated": 5,
   "componentDetails": {
-    ":mule": [
-      1,
-      0
-    ],
-    ":catch-exception-strategy": [
-      1,
-      0
-    ],
-    ":flow": [
-      1,
-      0
-    ],
-    "ws:consumer-config": [
-      0,
-      1
-    ],
-    "ws:consumer": [
-      1,
-      0
-    ],
-    ":set-property": [
-      1,
-      0
-    ]
+    ":mule": {
+      "success": 1,
+      "failure": 0
+    },
+    ":catch-exception-strategy": {
+      "success": 1,
+      "failure": 0
+    },
+    ":flow": {
+      "success": 1,
+      "failure": 0
+    },
+    "ws:consumer-config": {
+      "success": 0,
+      "failure": 1
+    },
+    "ws:consumer": {
+      "success": 1,
+      "failure": 0
+    },
+    ":set-property": {
+      "success": 1,
+      "failure": 0
+    }
   },
   "numberOfMELExpressions": 1,
   "numberOfMELExpressionsMigrated": 1,

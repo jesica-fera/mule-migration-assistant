@@ -1,48 +1,48 @@
 {
   "projectType": "MULE_THREE_APPLICATION",
   "projectName": "input",
-  "connectorsUsed": [
+  "connectorsMigrated": [
     "org.mule.connectors:mule-http-connector:1.5.25"
   ],
   "numberOfMuleComponents": 15,
   "numberOfMuleComponentsMigrated": 14,
   "componentDetails": {
-    ":mule": [
-      1,
-      0
-    ],
-    ":flow": [
-      4,
-      0
-    ],
-    ":set-payload": [
-      3,
-      0
-    ],
-    "dw:transform-message": [
-      1,
-      0
-    ],
-    "http:listener-config": [
-      1,
-      0
-    ],
-    "http:listener": [
-      1,
-      0
-    ],
-    ":set-attachment": [
-      0,
-      1
-    ],
-    "apikit-soap:config": [
-      1,
-      0
-    ],
-    "apikit-soap:router": [
-      2,
-      0
-    ]
+    ":mule": {
+      "success": 1,
+      "failure": 0
+    },
+    ":flow": {
+      "success": 4,
+      "failure": 0
+    },
+    ":set-payload": {
+      "success": 3,
+      "failure": 0
+    },
+    "dw:transform-message": {
+      "success": 1,
+      "failure": 0
+    },
+    "http:listener-config": {
+      "success": 1,
+      "failure": 0
+    },
+    "http:listener": {
+      "success": 1,
+      "failure": 0
+    },
+    ":set-attachment": {
+      "success": 0,
+      "failure": 1
+    },
+    "apikit-soap:config": {
+      "success": 1,
+      "failure": 0
+    },
+    "apikit-soap:router": {
+      "success": 2,
+      "failure": 0
+    }
   },
   "numberOfMELExpressions": 0,
   "numberOfMELExpressionsMigrated": 0,

@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.mule.migrated</groupId>
-  <artifactId>integration/demo_connect</artifactId>
+  <artifactId>demo_connect</artifactId>
   <version>1.0.0-M4-SNAPSHOT</version>
   <packaging>mule-application</packaging>
   <description>Application migrated with MMA</description>
