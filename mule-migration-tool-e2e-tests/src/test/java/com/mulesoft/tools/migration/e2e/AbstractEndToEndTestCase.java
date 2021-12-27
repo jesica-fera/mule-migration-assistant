@@ -84,7 +84,6 @@ public abstract class AbstractEndToEndTestCase {
     final String projectBasePath = new File(getResourceUri("e2e/" + projectName + "/input")).getAbsolutePath();
 
     final String outPutPath = migrationResult.getRoot().toPath().resolve(projectName).toAbsolutePath().toString();
-    System.setProperty(MigrationRunner.JSON_REPORT_PROP_NAME, "true");
 
     // Run migration tool
     final List<String> command = buildMigratorArgs(projectBasePath, outPutPath, projectName);
@@ -108,6 +107,7 @@ public abstract class AbstractEndToEndTestCase {
     command.add(RUNTIME_VERSION);
     command.add("-projectGAV");
     command.add(":" + projectName.replaceAll(".*/", "") + ":");
+    command.add("-jsonReport");
 
     return command;
   }
