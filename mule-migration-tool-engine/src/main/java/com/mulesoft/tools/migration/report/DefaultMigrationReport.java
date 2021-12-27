@@ -244,7 +244,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   @Override
   public void addComponentSuccess(Element element) {
-    logger.debug(">>>>> addComponentSuccess {}", element.getName());
+    logger.debug("addComponentSuccess {}", element.getName());
     String name = getComponentKey(element);
     components.putIfAbsent(name, new ComponentMigrationStatus());
     components.get(name).success();
@@ -252,7 +252,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
 
   @Override
   public void addComponentFailure(Element element) {
-    logger.debug("XXXXX addComponentFailure {}", element.getName());
+    logger.debug("addComponentFailure {}", element.getName());
     String name = getComponentKey(element);
     components.putIfAbsent(name, new ComponentMigrationStatus());
     components.get(name).failure();
@@ -283,7 +283,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     this.dwTransformsSuccess++;
     int lines = countLines(script);
     this.dwTransformLinesSuccess += lines;
-    logger.debug("  --->>> dwTransformsSuccess - {} lines", lines);
+    logger.debug("dwTransformsSuccess - {} lines", lines);
   }
 
   @Override
@@ -291,7 +291,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     this.dwTransformsFailure++;
     int lines = countLines(script);
     this.dwTransformLinesFailure += lines;
-    logger.debug("  ---XXX dwTransformsFailure - {} lines", lines);
+    logger.debug("dwTransformsFailure - {} lines", lines);
   }
 
   @Override
@@ -319,7 +319,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     this.melExpressionsSuccess++;
     int lines = countLines(melExpression);
     this.melLinesSuccess += lines;
-    logger.debug("  -->> melExpressionSuccess - {} lines -- {}", lines, melExpression);
+    logger.debug("melExpressionSuccess - {} lines -- {}", lines, melExpression);
   }
 
   @Override
@@ -327,7 +327,7 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     this.melExpressionsFailure++;
     int lines = countLines(melExpression);
     this.melLinesFailure += lines;
-    logger.debug("  --XX melExpressionFailure - {} lines -- {}", lines, melExpression);
+    logger.debug("melExpressionFailure - {} lines -- {}", lines, melExpression);
   }
 
   private int countLines(String melExpression) {

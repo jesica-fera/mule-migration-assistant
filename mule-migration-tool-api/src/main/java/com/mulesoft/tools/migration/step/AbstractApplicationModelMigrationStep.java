@@ -102,13 +102,13 @@ public abstract class AbstractApplicationModelMigrationStep implements Applicati
       } else {
         sourceElement = new Element("nullElement", getNamespace("nullElement"));
       }
-      logger.debug(">>>>> before migrating {}:{} -- step {}", sourceElement.getNamespacePrefix(), sourceElement.getName(),
+      logger.debug("Before migrating {}:{} -- step {}", sourceElement.getNamespacePrefix(), sourceElement.getName(),
                    this.getClass().getSimpleName());
       executeMigration(element, report);
-      logger.debug(">>>>>  after migrating {}:{} -- step {}", element != null ? element.getNamespacePrefix() : "null",
+      logger.debug("After  migrating {}:{} -- step {}", element != null ? element.getNamespacePrefix() : "null",
                    element != null ? element.getName() : null,
                    this.getClass().getSimpleName());
-      logger.debug("----- reportMetrics: {} -- failures: report-entries: {} -> {} -- mel {} -> {} -- dw {} -> {}",
+      logger.debug("reportMetrics: {} -- failures: report-entries: {} -> {} -- mel {} -> {} -- dw {} -> {}",
                    reportMetrics(), entriesBefore, report.getReportEntries(ERROR).size(),
                    melFailuresBefore, report.getMelExpressionsFailureCount(), dwFailuresBefore,
                    report.getDwTransformsFailureCount());
