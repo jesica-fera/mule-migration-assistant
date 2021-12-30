@@ -8,27 +8,27 @@
   "numberOfMuleComponents": 22,
   "numberOfMuleComponentsMigrated": 21,
   "componentDetails": {
-    ":mule": {
+    "mule": {
       "success": 1,
       "failure": 0
     },
-    ":logger": {
+    "logger": {
       "success": 1,
       "failure": 0
     },
-    ":flow": {
+    "flow": {
       "success": 3,
       "failure": 0
     },
-    ":poll": {
+    "scheduler": {
       "success": 1,
       "failure": 0
     },
-    ":set-payload": {
+    "set-payload": {
       "success": 1,
       "failure": 0
     },
-    ":set-variable": {
+    "set-variable": {
       "success": 1,
       "failure": 0
     },
@@ -48,23 +48,23 @@
       "success": 2,
       "failure": 1
     },
-    "file:connector": {
+    "file:config": {
       "success": 1,
       "failure": 0
     },
-    "file:outbound-endpoint": {
+    "file:write": {
       "success": 1,
       "failure": 0
     },
-    ":set-property": {
+    "compatibility:set-property": {
       "success": 1,
       "failure": 0
     },
-    ":copy-properties": {
+    "compatibility:copy-properties": {
       "success": 2,
       "failure": 0
     },
-    ":remove-property": {
+    "compatibility:remove-property": {
       "success": 2,
       "failure": 0
     }
@@ -81,6 +81,7 @@
     {
       "level": "WARN",
       "key": "http.statusCode",
+      "component": "http:response",
       "lineNumber": 24,
       "columnNumber": 113,
       "message": "Avoid using an outbound property to determine the status code.",
@@ -90,6 +91,7 @@
     {
       "level": "WARN",
       "key": "http.statusCode",
+      "component": "http:error-response",
       "lineNumber": 30,
       "columnNumber": 141,
       "message": "Avoid using an outbound property to determine the status code.",
@@ -99,6 +101,7 @@
     {
       "level": "WARN",
       "key": "message.attributesToInboundProperties",
+      "component": "compatibility:attributes-to-inbound-properties",
       "lineNumber": 38,
       "columnNumber": 57,
       "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
@@ -108,6 +111,7 @@
     {
       "level": "WARN",
       "key": "message.copyProperties",
+      "component": "compatibility:copy-properties",
       "lineNumber": 45,
       "columnNumber": 57,
       "message": "Instead of copying inbound properties in the flow, use the \u0027attributes\u0027 of the message directly.",
@@ -117,6 +121,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:remove-property",
       "lineNumber": 51,
       "columnNumber": 62,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -126,6 +131,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:set-property",
       "lineNumber": 57,
       "columnNumber": 139,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -135,6 +141,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:outbound-properties-to-var",
       "lineNumber": 63,
       "columnNumber": 51,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -144,6 +151,7 @@
     {
       "level": "WARN",
       "key": "message.attributesToInboundProperties",
+      "component": "compatibility:attributes-to-inbound-properties",
       "lineNumber": 73,
       "columnNumber": 57,
       "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
@@ -153,6 +161,7 @@
     {
       "level": "WARN",
       "key": "message.copyProperties",
+      "component": "compatibility:copy-properties",
       "lineNumber": 80,
       "columnNumber": 57,
       "message": "Instead of copying inbound properties in the flow, use the \u0027attributes\u0027 of the message directly.",
@@ -162,6 +171,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:remove-property",
       "lineNumber": 86,
       "columnNumber": 62,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -171,6 +181,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:outbound-properties-to-var",
       "lineNumber": 92,
       "columnNumber": 51,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -180,6 +191,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:outbound-properties-to-var",
       "lineNumber": 111,
       "columnNumber": 51,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -189,6 +201,7 @@
     {
       "level": "WARN",
       "key": "message.attributesToInboundProperties",
+      "component": "compatibility:attributes-to-inbound-properties",
       "lineNumber": 121,
       "columnNumber": 57,
       "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
@@ -198,6 +211,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:outbound-properties-to-var",
       "lineNumber": 128,
       "columnNumber": 51,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -207,6 +221,7 @@
     {
       "level": "WARN",
       "key": "message.attributesToInboundProperties",
+      "component": "compatibility:attributes-to-inbound-properties",
       "lineNumber": 136,
       "columnNumber": 57,
       "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",
@@ -216,6 +231,7 @@
     {
       "level": "WARN",
       "key": "message.outboundProperties",
+      "component": "compatibility:outbound-properties-to-var",
       "lineNumber": 148,
       "columnNumber": 51,
       "message": "Instead of using outbound properties in the flow, move the expression that sets the property into the XML attribute (such as \u0027method\u0027) of the operation or listener that accepts the expression.",
@@ -225,6 +241,7 @@
     {
       "level": "ERROR",
       "key": "http.port",
+      "component": "http:request",
       "lineNumber": 154,
       "columnNumber": 72,
       "message": "\u0027port\u0027 cannot be overridden by the HTTP Request operation. You can use an expression in the config to make it dynamic. Original value was port\u003d\"#[flowVars.dynPort]\".",
@@ -234,6 +251,7 @@
     {
       "level": "WARN",
       "key": "message.attributesToInboundProperties",
+      "component": "compatibility:attributes-to-inbound-properties",
       "lineNumber": 161,
       "columnNumber": 57,
       "message": "Expressions that query \u0027inboundProperties\u0027 from the message should instead query the message \u0027attributes\u0027. Remove this component if there are no uses of \u0027inboundProperties\u0027 in expressions or components that rely on \u0027inboundProperties\u0027 (such as \u0027copy-properties\u0027).",

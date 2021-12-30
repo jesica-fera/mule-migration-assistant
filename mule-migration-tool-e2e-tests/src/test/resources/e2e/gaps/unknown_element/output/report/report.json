@@ -5,15 +5,15 @@
   "numberOfMuleComponents": 4,
   "numberOfMuleComponentsMigrated": 4,
   "componentDetails": {
-    ":mule": {
+    "mule": {
       "success": 1,
       "failure": 0
     },
-    ":logger": {
+    "logger": {
       "success": 2,
       "failure": 0
     },
-    ":flow": {
+    "flow": {
       "success": 1,
       "failure": 0
     }

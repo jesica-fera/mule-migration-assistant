@@ -2,18 +2,26 @@
   "projectType": "MULE_THREE_APPLICATION",
   "projectName": "input",
   "connectorsMigrated": [],
-  "numberOfMuleComponents": 4,
+  "numberOfMuleComponents": 6,
   "numberOfMuleComponentsMigrated": 4,
   "componentDetails": {
-    ":mule": {
+    "unknown:source": {
+      "success": 0,
+      "failure": 1
+    },
+    "unknown:operation": {
+      "success": 0,
+      "failure": 1
+    },
+    "mule": {
       "success": 1,
       "failure": 0
     },
-    ":logger": {
+    "logger": {
       "success": 2,
       "failure": 0
     },
-    ":flow": {
+    "flow": {
       "success": 1,
       "failure": 0
     }
@@ -30,6 +38,7 @@
     {
       "level": "ERROR",
       "key": "components.unsupported",
+      "component": "unknown:source",
       "lineNumber": 5,
       "columnNumber": 25,
       "message": "The migration of \u0027unknown\u0027 is not supported.",
@@ -39,6 +48,7 @@
     {
       "level": "ERROR",
       "key": "components.unsupported",
+      "component": "unknown:operation",
       "lineNumber": 16,
       "columnNumber": 28,
       "message": "The migration of \u0027unknown\u0027 is not supported.",

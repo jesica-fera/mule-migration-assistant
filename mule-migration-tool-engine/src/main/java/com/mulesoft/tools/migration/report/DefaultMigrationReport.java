@@ -34,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Comment;
 import org.jdom2.Element;
 import org.jdom2.output.XMLOutputter;
@@ -238,8 +239,9 @@ public class DefaultMigrationReport implements MigrationReport<ReportEntryModel>
     return components;
   }
 
-  private String getComponentKey(Element element) {
-    return String.format("%s:%s", element.getNamespace().getPrefix(), element.getName());
+  public static String getComponentKey(Element element) {
+    String prefix = StringUtils.isBlank(element.getNamespace().getPrefix()) ? "" : element.getNamespace().getPrefix() + ":";
+    return prefix + element.getName();
   }
 
   @Override

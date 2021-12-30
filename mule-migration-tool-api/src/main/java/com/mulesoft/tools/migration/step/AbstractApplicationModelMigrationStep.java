@@ -115,9 +115,9 @@ public abstract class AbstractApplicationModelMigrationStep implements Applicati
       if (reportMetrics()) {
         if (report.getReportEntries(ERROR).size() <= entriesBefore + (report.getMelExpressionsFailureCount() - melFailuresBefore)
             + (report.getDwTransformsFailureCount() - dwFailuresBefore)) {
-          report.addComponentSuccess(sourceElement);
+          report.addComponentSuccess(element);
         } else {
-          report.addComponentFailure(sourceElement);
+          report.addComponentFailure(element);
         }
       }
     } catch (Exception e) {

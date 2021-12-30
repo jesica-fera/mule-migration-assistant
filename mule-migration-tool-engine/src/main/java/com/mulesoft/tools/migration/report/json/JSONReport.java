@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.mulesoft.tools.migration.report.DefaultMigrationReport.getComponentKey;
+
+import org.jdom2.Element;
 
 /**
  * Generates JSON Report
@@ -170,16 +173,19 @@ public class JSONReport {
 
     private final MigrationReport.Level level;
     private final String key;
+    private final String component;
     private final Integer lineNumber;
     private final Integer columnNumber;
     private final String message;
     private final String filePath;
     private final List<String> documentationLinks = new ArrayList<>();
 
-    public JSONReportEntryModel(String key, MigrationReport.Level level, Integer lineNumber, Integer columnNumber, String message,
-                                String filePath) {
+    private JSONReportEntryModel(String key, MigrationReport.Level level, Element component, Integer lineNumber,
+                                 Integer columnNumber, String message,
+                                 String filePath) {
       this.key = key;
       this.level = level;
+      this.component = component != null ? getComponentKey(component) : "UNKNOWN";
       this.lineNumber = lineNumber;
       this.columnNumber = columnNumber;
       this.message = message;
@@ -188,7 +194,8 @@ public class JSONReport {
 
     public static JSONReportEntryModel fromReportModel(ReportEntryModel rem, Path outputFolder) {
       String filePath = relativizePath(rem.getFilePath(), outputFolder);
-      return new JSONReportEntryModel(rem.getKey(), rem.getLevel(), rem.getLineNumber(), rem.getColumnNumber(), rem.getMessage(),
+      return new JSONReportEntryModel(rem.getKey(), rem.getLevel(), rem.getElement(), rem.getLineNumber(), rem.getColumnNumber(),
+                                      rem.getMessage(),
                                       filePath);
     }
 
@@ -213,6 +220,10 @@ public class JSONReport {
 
     public MigrationReport.Level getLevel() {
       return level;
+    }
+
+    public String getComponent() {
+      return component;
     }
 
     public Integer getLineNumber() {
