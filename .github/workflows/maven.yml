@@ -5,7 +5,7 @@ name: Mule Migration Assistant Build
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, chore/mig-cost-win ]
   pull_request:
     branches: [ master ]
 
@@ -13,6 +13,10 @@ jobs:
   build-linux:
 
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        jdk: [1.8, 1.11, 1.17] # LTS versions
 
     steps:
     - name: checkout
@@ -27,10 +31,10 @@ jobs:
     - name: log-settings
       run: cat \/home\/runner\/.m2\/settings.xml
 
-    - name: Set up JDK 1.8
+    - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: ${{ matrix.jdk }}
 
     - name: mvn-version
       run: mvn --version
@@ -41,6 +45,10 @@ jobs:
   build-windows:
 
     runs-on: windows-latest
+
+    strategy:
+      matrix:
+        jdk: [1.8, 1.11, 1.17] # LTS versions
 
     steps:
     - name: checkout
@@ -55,10 +63,10 @@ jobs:
     - name: log-settings
       run: cat C:\Users\runneradmin\.m2\settings.xml
 
-    - name: Set up JDK 1.8
+    - name: Set up JDK ${{ matrix.jdk }}
       uses: actions/setup-java@v1
       with:
-        java-version: 1.8
+        java-version: ${{ matrix.jdk }}
 
     - name: mvn-version
       run: mvn --version
