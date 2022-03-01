@@ -67,7 +67,7 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
             logger.debug("Could not rename yaml file!");
           }
         } catch (IOException exception) {
-          logger.debug("Could not rename yaml file!");
+          logger.debug("Could not rename yaml file!", exception);
         }
       }
     } else {
