@@ -76,7 +76,7 @@ public class SetSecureProperties implements ProjectStructureContribution {
           secureProperties =
               Arrays.stream(securePropertiesList.split(SECURE_PROPERTIES_SEPARATOR)).map(String::trim).collect(toList());
           properties.remove(SECURE_PROPERTIES);
-          try (FileOutputStream outputStream = new FileOutputStream(muleAppProperties)){
+          try (FileOutputStream outputStream = new FileOutputStream(muleAppProperties)) {
             properties.store(outputStream, null);
           }
         }
