@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
@@ -59,7 +60,7 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
       File newYamlFile = new File(projectBasePath, pomModel.get().getArtifactId() + YAML_EXTENSION);
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
         try {
-          Files.move(yamlFile.toPath(), newYamlFile.toPath());
+          Files.move(yamlFile.toPath(), newYamlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
           logger.debug(
                        String.format("Renamed yaml policy from %s to %s", yamlFile.getAbsolutePath(),
                                      newYamlFile.getAbsolutePath()));
