@@ -60,7 +60,8 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
       File newYamlFile = new File(projectBasePath, pomModel.get().getArtifactId() + YAML_EXTENSION);
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
         try {
-          Files.move(yamlFile.toPath(), newYamlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+          Files.copy(yamlFile.toPath(), newYamlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+          Files.delete(yamlFile.toPath());
           logger.debug(
                        String.format("Renamed yaml policy from %s to %s", yamlFile.getAbsolutePath(),
                                      newYamlFile.getAbsolutePath()));
