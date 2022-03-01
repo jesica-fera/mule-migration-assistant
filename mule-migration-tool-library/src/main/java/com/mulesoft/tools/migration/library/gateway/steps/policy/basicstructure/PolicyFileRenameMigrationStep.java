@@ -59,6 +59,9 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
         yamlFile.renameTo(newYamlFile);
         logger.debug(String.format("Renamed yaml policy to %s", newYamlFile.getAbsolutePath()));
+        if (!newYamlFile.exists()) {
+          logger.debug("Could not rename yaml file!");
+        }
       }
     } else {
       migrationReport.report("basicStructure.noPomModel", null, null, xmlFilename);
