@@ -9,6 +9,7 @@ import static com.mulesoft.tools.migration.step.util.ProjectStructureUtils.renam
 import static java.io.File.separator;
 import static java.util.Arrays.stream;
 
+import com.mulesoft.tools.migration.library.tools.MelToDwExpressionMigrator;
 import com.mulesoft.tools.migration.project.model.ApplicationModel;
 import com.mulesoft.tools.migration.project.model.pom.PomModel;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
@@ -21,6 +22,8 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Rename Policy files
@@ -29,6 +32,7 @@ import org.apache.commons.io.filefilter.SuffixFileFilter;
  */
 public class PolicyFileRenameMigrationStep implements ProjectStructureContribution {
 
+  private static Logger logger = LoggerFactory.getLogger(PolicyFileRenameMigrationStep.class);
   private static final Path SOURCE_FILE_PATH = Paths.get("src" + separator + "main" + separator + "mule");
 
   private static final String XML_EXTENSION = ".xml";
@@ -54,6 +58,7 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
       File newYamlFile = new File(projectBasePath, pomModel.get().getArtifactId() + YAML_EXTENSION);
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
         yamlFile.renameTo(newYamlFile);
+        logger.debug(String.format("Renamed yaml policy to %s", newYamlFile.getAbsolutePath()));
       }
     } else {
       migrationReport.report("basicStructure.noPomModel", null, null, xmlFilename);
