@@ -78,7 +78,9 @@ public class PolicyYamlMigrationStep implements ProjectStructureContribution {
       checkYamlProperty(yamlData, "providedCharacteristics", new ArrayList<>(), migrationReport,
                         DEFAULT_POLICY_YAML_VALUE_MESSAGE);
       checkConfiguration(yamlData, migrationReport);
-      yaml.dump(yamlData, new FileWriter(yamlFile));
+      try (FileWriter fileWriter = new FileWriter(yamlFile)) {
+        yaml.dump(yamlData, fileWriter);
+      }
     }
   }
 
