@@ -9,7 +9,6 @@ import static com.mulesoft.tools.migration.step.util.ProjectStructureUtils.renam
 import static java.io.File.separator;
 import static java.util.Arrays.stream;
 
-import com.mulesoft.tools.migration.library.tools.MelToDwExpressionMigrator;
 import com.mulesoft.tools.migration.project.model.ApplicationModel;
 import com.mulesoft.tools.migration.project.model.pom.PomModel;
 import com.mulesoft.tools.migration.step.category.MigrationReport;
@@ -17,6 +16,7 @@ import com.mulesoft.tools.migration.step.category.ProjectStructureContribution;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -57,9 +57,16 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
     if (pomModel.isPresent()) {
       File newYamlFile = new File(projectBasePath, pomModel.get().getArtifactId() + YAML_EXTENSION);
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
-        yamlFile.renameTo(newYamlFile);
-        logger.debug(String.format("Renamed yaml policy to %s", newYamlFile.getAbsolutePath()));
-        if (!newYamlFile.exists()) {
+        try {
+          newYamlFile.createNewFile();
+          boolean renamed = yamlFile.renameTo(newYamlFile);
+          logger.debug(
+                       String.format("Renamed yaml policy from %s to %s", yamlFile.getAbsolutePath(),
+                                     newYamlFile.getAbsolutePath()));
+          if (!renamed || !newYamlFile.exists()) {
+            logger.debug("Could not rename yaml file!");
+          }
+        } catch (IOException exception) {
           logger.debug("Could not rename yaml file!");
         }
       }
