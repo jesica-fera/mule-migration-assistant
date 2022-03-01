@@ -166,7 +166,9 @@ public class ApplicationPersister {
 
       File targetFile = targetFilePath.toFile();
       targetFile.getParentFile().mkdirs();
-      new XMLOutputter().output(finalDocument, new FileOutputStream(targetFile));
+      try (FileOutputStream fileOutputStream = new FileOutputStream(targetFile)) {
+        new XMLOutputter().output(finalDocument, fileOutputStream);
+      }
     }
   }
 
