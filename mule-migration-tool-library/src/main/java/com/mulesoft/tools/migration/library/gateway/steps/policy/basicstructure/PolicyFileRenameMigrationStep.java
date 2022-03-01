@@ -23,7 +23,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.Optional;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,8 +60,7 @@ public class PolicyFileRenameMigrationStep implements ProjectStructureContributi
       File newYamlFile = new File(projectBasePath, pomModel.get().getArtifactId() + YAML_EXTENSION);
       if (!newYamlFile.exists() && !new File(projectBasePath, pomModel.get().getArtifactId() + YML_EXTENSION).exists()) {
         try {
-          Files.copy(yamlFile.toPath(), newYamlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-          FileUtils.forceDelete(yamlFile);
+          Files.move(yamlFile.toPath(), newYamlFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
           logger.debug(String.format("Failed to rename yaml file to", newYamlFile.getAbsolutePath()), e);
           migrationReport.report("basicStructure.yamlRenameFailed", null, null);
